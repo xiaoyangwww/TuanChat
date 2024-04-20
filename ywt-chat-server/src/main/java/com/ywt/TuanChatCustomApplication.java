@@ -1,5 +1,6 @@
 package com.ywt;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -9,7 +10,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
  * @date 2024/04/15
  */
 @SpringBootApplication(scanBasePackages = {"com.ywt"})
-//@MapperScan({"com.ywt.**.mapper"})
+@MapperScan({"com.ywt.**.mapper"})
 @ServletComponentScan
 public class TuanChatCustomApplication {
 
