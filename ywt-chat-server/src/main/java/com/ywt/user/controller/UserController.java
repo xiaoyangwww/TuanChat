@@ -1,7 +1,9 @@
 package com.ywt.user.controller;
 
 
-import org.springframework.web.bind.annotation.RequestMapping;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.stereotype.Controller;
 
@@ -13,9 +15,16 @@ import org.springframework.stereotype.Controller;
  * @author ywt
  * @since 2024-04-15
  */
-@Controller
-@RequestMapping("/user")
+@RestController
+@RequestMapping("/capi/user")
+@Api(value = "用户管理相关接口")
 public class UserController {
+
+    @GetMapping("/public/userInfo")
+    @ApiOperation("获取用户信息")
+    public String getUserById(@RequestParam Long uid) {
+        return "123";
+    }
 
 }
 

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import lombok.Builder;
 import lombok.Data;
@@ -70,7 +71,7 @@ public class User implements Serializable {
      * 最后上下线时间
      */
     @TableField("last_opt_time")
-    private LocalDateTime lastOptTime;
+    private Date lastOptTime;
 
     /**
      * ip信息
@@ -94,13 +95,13 @@ public class User implements Serializable {
      * 创建时间
      */
     @TableField("create_time")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 修改时间
      */
     @TableField("update_time")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
 
 }
