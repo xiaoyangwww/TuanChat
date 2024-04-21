@@ -1,5 +1,6 @@
 package com.ywt.websocket;
 
+import com.ywt.websocket.handler.MyHandShakeHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -95,6 +96,8 @@ public class NettyWebSocketServer {
                         pipeline.addLast(new HttpObjectAggregator(8192));
                         //保存用户ip
 //                        pipeline.addLast(new HttpHeadersHandler());
+                        // 获取用户的token
+                        pipeline.addLast(new MyHandShakeHandler());
                         /**
                          * 说明：
                          *  1. 对于 WebSocket，它的数据是以帧frame 的形式传递的；

@@ -1,9 +1,11 @@
 package com.ywt.websocket.service.impl;
 
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.ywt.user.dao.UserDao;
 import com.ywt.user.domain.entity.User;
 import com.ywt.user.service.LoginService;
 import com.ywt.websocket.domain.dto.WSChannelExtraDTO;
@@ -52,6 +54,9 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Autowired
     private LoginService loginService;
+
+    @Autowired
+    private UserDao userDao;
 
     /**
      * 所有已连接的websocket连接列表和一些额外参数(已经登录的用户) channel -> user
@@ -103,10 +108,29 @@ public class WebSocketServiceImpl implements WebSocketService {
         }
         // 获取token
         String token = loginService.login(user.getId());
-        // 绑定登录用户的ID
-//        ONLINE_WS_MAP.get(channel).setUid(user.getId());
         // 删除code -》 channel
         WAIT_LOGIN_MAP.invalidate(code);
+        loginSuccess(channel,user,token);
+    }
+
+    @Override
+    public void handleAuthorize(Channel channel, String token) {
+        Long validUid = loginService.getValidUid(token);
+        if (ObjUtil.isNull(validUid)) {
+            // 登录token失效，给前端返回删除token信息
+            sendMsg(channel,WebSocketAdapter.buildLoginLose());
+            return;
+        }
+        User user = userDao.getById(validUid);
+        // token 有效，建立连接 channel -> uid,并发送登录成功的信息 TODO 消息订阅
+        loginSuccess(channel,user,token);
+
+    }
+
+    private void loginSuccess(Channel channel, User user,String token) {
+        WSChannelExtraDTO wsChannelExtraDTO = new WSChannelExtraDTO();
+        wsChannelExtraDTO.setUid(user.getId());
+        ONLINE_WS_MAP.put(channel,wsChannelExtraDTO);
         sendMsg(channel,WebSocketAdapter.buildLoginSuccessResp(user,token));
     }
 

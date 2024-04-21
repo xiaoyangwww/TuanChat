@@ -53,6 +53,15 @@ public class WebSocketAdapter {
         wsLoginSuccessWSBaseResp.setType(WSRespTypeEnum.LOGIN_SUCCESS.getType());
         return wsLoginSuccessWSBaseResp;
     }
+
+    /**
+     *  登录token失效，给前端返回删除token信息
+     */
+    public static WSBaseResp<?> buildLoginLose() {
+        WSBaseResp<WSMessage> message = new WSBaseResp<>();
+        message.setType(WSRespTypeEnum.INVALIDATE_TOKEN.getType());
+        return message;
+    }
 }
 
 

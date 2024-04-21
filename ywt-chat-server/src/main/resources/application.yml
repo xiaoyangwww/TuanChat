@@ -29,7 +29,7 @@ spring:
       matching-strategy: ANT_PATH_MATCHER
   redis:
     # Redis服务器地址
-    host: localhost
+    host: 114.132.41.249
     # Redis服务器端口号
     port: 6379
     # 使用的数据库索引，默认是0

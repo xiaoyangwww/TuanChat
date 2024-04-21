@@ -79,6 +79,7 @@ public class WXServiceImpl implements WXService {
         User user = userDao.getUserByOpenId(openId);
         // 用户存在并且有权限，直接登录
         if(ObjectUtil.isNotNull(user) && StrUtil.isNotEmpty(user.getAvatar())) {
+            // TODO 消息订阅
             return null;
         }
         // 用户不存在，注册

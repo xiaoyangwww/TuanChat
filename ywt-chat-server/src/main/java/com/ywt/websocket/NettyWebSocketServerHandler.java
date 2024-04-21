@@ -1,9 +1,11 @@
 package com.ywt.websocket;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.sun.org.apache.bcel.internal.generic.SWITCH;
+import com.ywt.common.utils.NettyUtil;
 import com.ywt.websocket.domain.enums.WSReqTypeEnum;
 import com.ywt.websocket.domain.vo.req.WSBaseReq;
 import com.ywt.websocket.service.WebSocketService;
@@ -49,7 +51,14 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof WebSocketServerProtocolHandler.HandshakeComplete) {
             System.out.println("websocket 握手完成");
+            // websocket 握手完成 就建立channel -> userid，游客也能收到消息
             webSocketService.connect(ctx.channel());
+            // 获取token
+            String token = NettyUtil.getAttr(ctx.channel(), NettyUtil.TOKEN);
+            // 登录认证
+            if (StrUtil.isNotEmpty(token)) {
+                this.webSocketService.handleAuthorize(ctx.channel(),token);
+            }
         } else if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) evt;
             if (event.state() == IdleState.READER_IDLE) {

@@ -5,6 +5,7 @@ import com.ywt.common.constant.RedisKey;
 import com.ywt.common.utils.JwtUtils;
 import com.ywt.user.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ywt.chat.common.utils.RedisUtils;
 
@@ -28,6 +29,7 @@ public class LoginServiceImpl implements LoginService {
     private JwtUtils jwtUtils;
 
     @Override
+    @Async
     public void renewalTokenIfNecessary(String token) {
         Long uid = getValidUid(token);
         if (uid == null) return;
@@ -60,7 +62,7 @@ public class LoginServiceImpl implements LoginService {
         if (uid == null) {
             return null;
         }
-        String oldToken = RedisUtils.get(getUidKey(uid), String.class);
+        String oldToken = RedisUtils.getStr(getUidKey(uid));
         if (token.equals(oldToken)) {
             return uid;
         }

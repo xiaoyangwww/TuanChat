@@ -31,4 +31,9 @@ public interface WebSocketService {
      * 通过websocket 发送已经授权,登录成功的消息
      */
     void handleAuthSuccess(Integer code, User user);
+
+    /**
+     * 登录认证，保持登录状态
+     */
+    void handleAuthorize(Channel channel, String token);
 }
