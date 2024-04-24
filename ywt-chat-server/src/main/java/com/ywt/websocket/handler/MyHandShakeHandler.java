@@ -31,8 +31,8 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public class MyHandShakeHandler  extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        final HttpObject httpObject = (HttpObject) msg;
-        if (httpObject instanceof HttpRequest) {
+        if (msg instanceof HttpRequest) {
+            final HttpObject httpObject = (HttpObject) msg;
             final HttpRequest req = (HttpRequest) httpObject;
             // 获取token参数
             UrlBuilder urlBuilder = UrlBuilder.ofHttp(req.uri());

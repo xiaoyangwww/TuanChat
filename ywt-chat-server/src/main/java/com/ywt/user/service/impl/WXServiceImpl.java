@@ -6,14 +6,11 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.ywt.user.dao.UserDao;
 import com.ywt.user.domain.entity.User;
-import com.ywt.user.service.LoginService;
 import com.ywt.user.service.UserService;
 import com.ywt.user.service.WXService;
 import com.ywt.user.service.adapter.TextBuilder;
 import com.ywt.user.service.adapter.UserBuilder;
 import com.ywt.websocket.service.WebSocketService;
-import io.netty.channel.Channel;
-import io.swagger.models.auth.In;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
@@ -84,7 +81,7 @@ public class WXServiceImpl implements WXService {
         }
         // 用户不存在，注册
         if(ObjectUtil.isNull(user)) {
-            User insert = UserBuilder.build(openId);
+            User insert = UserBuilder.buildUser(openId);
             // 在注册用户之前可能还会执行一些业务
             userService.register(insert);
         }
@@ -103,7 +100,7 @@ public class WXServiceImpl implements WXService {
     public void authorize(WxOAuth2UserInfo userInfo) {
         // 将微信的用户信息保存
         User user = userDao.getUserByOpenId(userInfo.getOpenid());
-        User update = UserBuilder.build(user.getId(), userInfo);
+        User update = UserBuilder.buildAuthorizeUser(user.getId(), userInfo);
         userDao.updateById(update);
 
         Integer code = WAIT_AUTH_MAP.getIfPresent(userInfo.getOpenid());

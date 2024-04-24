@@ -8,8 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * <p>
@@ -21,6 +20,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @TableName("user_backpack")
 public class UserBackpack implements Serializable {
 
@@ -42,7 +44,7 @@ public class UserBackpack implements Serializable {
      * 物品id
      */
     @TableField("item_id")
-    private Integer itemId;
+    private Long itemId;
 
     /**
      * 使用状态 0.待使用 1已使用
