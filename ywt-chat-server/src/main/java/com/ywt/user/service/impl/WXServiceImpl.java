@@ -70,7 +70,7 @@ public class WXServiceImpl implements WXService {
     public WxMpXmlOutMessage scan(WxMpXmlMessage wxMpXmlMessage, WxMpService wxMpService) {
 
         String openId = wxMpXmlMessage.getFromUser();
-        // //扫码关注的渠道事件有前缀，需要去除,qrscene_123
+        // 扫码关注的渠道事件有前缀，需要去除,qrscene_123
         String code = getEventKey(wxMpXmlMessage);
         // 判断用户是否存在
         User user = userDao.getUserByOpenId(openId);

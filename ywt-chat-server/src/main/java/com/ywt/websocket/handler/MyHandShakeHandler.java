@@ -2,6 +2,7 @@ package com.ywt.websocket.handler;
 
 import cn.hutool.core.net.url.UrlBuilder;
 import cn.hutool.core.net.url.UrlPath;
+import cn.hutool.core.util.StrUtil;
 import com.ywt.common.utils.NettyUtil;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
@@ -15,6 +16,8 @@ import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import org.apache.http.client.utils.URIBuilder;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
@@ -41,8 +44,17 @@ public class MyHandShakeHandler  extends ChannelInboundHandlerAdapter {
                     .map(k -> k.get("token"))
                     .map(CharSequence::toString);
             tokenOptional.ifPresent(s -> NettyUtil.setAttr(ctx.channel(),NettyUtil.TOKEN,s));
+            // 获取用户ip地址
+            String ip  = req.headers().get("X-Real-IP");
+            if (StrUtil.isEmpty(ip)) {
+                InetSocketAddress address = (InetSocketAddress)ctx.channel().remoteAddress();
+                ip = address.getAddress().getHostAddress();
+            }
+            NettyUtil.setAttr(ctx.channel(),NettyUtil.IP,ip);
             // 要将uri的路径改为 / ,不然webSocket无法建立连接
             req.setUri(urlBuilder.getPath().toString());
+            // 处理器只需使用一次
+            ctx.pipeline().remove(this);
         }
         // 执行下一个handler
         ctx.fireChannelRead(msg);

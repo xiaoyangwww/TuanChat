@@ -7,6 +7,7 @@ import com.ywt.common.domain.enums.YesOrNoEnum;
 import com.ywt.user.domain.entity.ItemConfig;
 import com.ywt.user.domain.entity.User;
 import com.ywt.user.domain.entity.UserBackpack;
+import com.ywt.user.domain.enums.ChatActiveStatusEnum;
 import com.ywt.user.domain.vo.Resp.user.BadgeResp;
 import com.ywt.user.domain.vo.Resp.user.UserInfoResp;
 import me.chanjar.weixin.common.bean.WxOAuth2UserInfo;
@@ -67,5 +68,14 @@ public class UserBuilder {
                 .thenComparing(BadgeResp::getObtain, Comparator.reverseOrder())).collect(Collectors.toList());
 
 
+    }
+
+    public static User buildOnlineUser(User user) {
+        User update = new User();
+        update.setId(user.getId());
+        update.setIpInfo(user.getIpInfo());
+        update.setLastOptTime(user.getLastOptTime());
+        update.setActiveStatus(ChatActiveStatusEnum.ONLINE.getType());
+        return update;
     }
 }

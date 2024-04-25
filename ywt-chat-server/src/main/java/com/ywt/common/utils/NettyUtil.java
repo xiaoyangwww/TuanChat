@@ -14,6 +14,8 @@ public class NettyUtil {
 
     public final static AttributeKey<String> TOKEN = AttributeKey.valueOf("token");
 
+    public final static AttributeKey<String> IP = AttributeKey.valueOf("ip");
+
     public static <T> void setAttr(Channel channel, AttributeKey<T> attributeKey, T data) {
         Attribute<T> attr = channel.attr(attributeKey);
         attr.set(data);

@@ -1,5 +1,6 @@
 package com.ywt.user.domain.entity;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -11,6 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 /**
@@ -24,7 +26,7 @@ import lombok.*;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Builder
-@TableName("user")
+@TableName(value = "user",autoResultMap = true)//设置自动生成resultmap
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements Serializable {
@@ -76,8 +78,8 @@ public class User implements Serializable {
     /**
      * ip信息
      */
-    @TableField("ip_info")
-    private String ipInfo;
+    @TableField(value = "ip_info",typeHandler = JacksonTypeHandler.class)
+    private IpInfo ipInfo;
 
     /**
      * 佩戴的徽章id
@@ -104,4 +106,10 @@ public class User implements Serializable {
     private Date updateTime;
 
 
+    public void refreshIp(String ip) {
+        if (ObjectUtil.isNull(ipInfo)) {
+            ipInfo = new IpInfo();
+        }
+        ipInfo.refreshIp(ip);
+    }
 }

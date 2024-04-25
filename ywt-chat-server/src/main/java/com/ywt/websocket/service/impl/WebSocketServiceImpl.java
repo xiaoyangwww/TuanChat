@@ -5,7 +5,10 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.ywt.common.event.UserOnlineEvent;
+import com.ywt.common.utils.NettyUtil;
 import com.ywt.user.dao.UserDao;
+import com.ywt.user.domain.entity.IpInfo;
 import com.ywt.user.domain.entity.User;
 import com.ywt.user.service.LoginService;
 import com.ywt.websocket.domain.dto.WSChannelExtraDTO;
@@ -18,9 +21,11 @@ import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -57,6 +62,9 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 所有已连接的websocket连接列表和一些额外参数(已经登录的用户) channel -> user
@@ -110,6 +118,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         String token = loginService.login(user.getId());
         // 删除code -》 channel
         WAIT_LOGIN_MAP.invalidate(code);
+        // 认证
         loginSuccess(channel,user,token);
     }
 
@@ -122,7 +131,7 @@ public class WebSocketServiceImpl implements WebSocketService {
             return;
         }
         User user = userDao.getById(validUid);
-        // token 有效，建立连接 channel -> uid,并发送登录成功的信息 TODO 消息订阅
+        // token 有效，登录成功
         loginSuccess(channel,user,token);
 
     }
@@ -130,7 +139,16 @@ public class WebSocketServiceImpl implements WebSocketService {
     private void loginSuccess(Channel channel, User user,String token) {
         WSChannelExtraDTO wsChannelExtraDTO = new WSChannelExtraDTO();
         wsChannelExtraDTO.setUid(user.getId());
+        // ，建立连接 channel -> uid
         ONLINE_WS_MAP.put(channel,wsChannelExtraDTO);
+        // 获取ip
+        String ip = NettyUtil.getAttr(channel, NettyUtil.IP);
+        user.setLastOptTime(new Date());
+        // 刷新用户的ip地址
+        user.refreshIp(ip);
+        // 登录成功发送消息，进行ip解析
+        applicationEventPublisher.publishEvent(new UserOnlineEvent(this,user));
+        // 发送登录成功的信息
         sendMsg(channel,WebSocketAdapter.buildLoginSuccessResp(user,token));
     }
 
