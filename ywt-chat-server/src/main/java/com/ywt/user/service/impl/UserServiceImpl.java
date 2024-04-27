@@ -1,21 +1,23 @@
 package com.ywt.user.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.ywt.common.event.UserBlackEvent;
 import com.ywt.common.event.UserRegisterEvent;
 import com.ywt.common.utils.AssertUtil;
 import com.ywt.common.utils.RequestHolder;
 import com.ywt.user.cache.ItemCache;
-import com.ywt.user.dao.ItemConfigDao;
+import com.ywt.user.dao.BlackDao;
 import com.ywt.user.dao.UserBackpackDao;
 import com.ywt.user.dao.UserDao;
-import com.ywt.user.domain.entity.ItemConfig;
-import com.ywt.user.domain.entity.User;
-import com.ywt.user.domain.entity.UserBackpack;
+import com.ywt.user.domain.entity.*;
+import com.ywt.user.domain.enums.BlackTypeEnum;
 import com.ywt.user.domain.enums.ItemEnum;
 import com.ywt.user.domain.enums.ItemTypeEnum;
+import com.ywt.user.domain.enums.RoleEnum;
 import com.ywt.user.domain.vo.Req.user.ModifyNameReq;
 import com.ywt.user.domain.vo.Resp.user.BadgeResp;
 import com.ywt.user.domain.vo.Resp.user.UserInfoResp;
+import com.ywt.user.service.RoleService;
 import com.ywt.user.service.UserService;
 import com.ywt.user.service.adapter.UserBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private BlackDao blackDao;
 
 
 
@@ -100,5 +108,40 @@ public class UserServiceImpl implements UserService {
         User user = userDao.getById(uid);
         // 封装
         return UserBuilder.buildBadgeResp(user,userBackpackList,itemConfigList);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void black(Long uid) {
+        User user = userDao.getById(uid);
+        boolean hasPower = roleService.hasPower(uid, RoleEnum.ADMIN);
+        AssertUtil.isTrue(hasPower,"没有权限哦！");
+
+        Black userBlack = new Black();
+        // 拉黑用户id
+        userBlack.setType(BlackTypeEnum.UID.getType());
+        userBlack.setTarget(uid.toString());
+        blackDao.save(userBlack);
+        // 拉黑用户ip
+        IpInfo ipInfo = user.getIpInfo();
+        if (ipInfo.getCreateIp().equals(ipInfo.getUpdateIp())) {
+            Black ipBlack = blackIP(ipInfo.getCreateIp());
+            blackDao.save(ipBlack);
+        }else {
+            Black createIpBlack = blackIP(ipInfo.getCreateIp());
+            Black updateIpBlack = blackIP(ipInfo.getUpdateIp());
+            blackDao.save(createIpBlack);
+            blackDao.save(updateIpBlack);
+        }
+        // 发送用户被拉黑的消息
+        applicationEventPublisher.publishEvent(new UserBlackEvent(this,user));
+
+    }
+
+    private Black blackIP(String ip) {
+        Black black = new Black();
+        black.setType(BlackTypeEnum.IP.getType());
+        black.setTarget(ip);
+        return black;
     }
 }

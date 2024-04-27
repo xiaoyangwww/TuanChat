@@ -3,6 +3,7 @@ package com.ywt.user.controller;
 
 import com.ywt.common.domain.vo.Resp.ApiResult;
 import com.ywt.common.utils.RequestHolder;
+import com.ywt.user.domain.vo.Req.user.BlackReq;
 import com.ywt.user.domain.vo.Req.user.ModifyNameReq;
 import com.ywt.user.domain.vo.Resp.user.BadgeResp;
 import com.ywt.user.domain.vo.Resp.user.UserInfoResp;
@@ -52,6 +53,21 @@ public class UserController {
     public ApiResult<List<BadgeResp>> badge() {
         return ApiResult.success(userService.badges(RequestHolder.get().getUid()));
     }
+
+//    @PutMapping("/badge")
+//    @ApiOperation("佩戴徽章")
+//    public ApiResult<Void> wearingBadge(@Valid @RequestBody WearingBadgeReq req) {
+//        userService.wearingBadge(RequestHolder.get().getUid(), req);
+//        return ApiResult.success();
+//    }
+
+    @PutMapping("/black")
+    @ApiOperation("拉黑用户")
+    public ApiResult<Void> black(@Valid @RequestBody BlackReq req) {
+        userService.black(req.getUid());
+        return ApiResult.success();
+    }
+
 
 }
 

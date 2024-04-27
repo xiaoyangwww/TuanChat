@@ -37,4 +37,10 @@ public interface UserService {
      * 获取可选徽章列表
      */
     List<BadgeResp> badges(Long uid);
+
+    /**
+     * 拉黑用户
+     * @param uid
+     */
+    void black(Long uid);
 }

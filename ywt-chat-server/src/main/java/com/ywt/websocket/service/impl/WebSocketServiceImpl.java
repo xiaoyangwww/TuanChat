@@ -7,11 +7,16 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.ywt.common.event.UserOnlineEvent;
 import com.ywt.common.utils.NettyUtil;
+import com.ywt.config.ThreadPoolConfig;
+import com.ywt.user.cache.UserCache;
 import com.ywt.user.dao.UserDao;
 import com.ywt.user.domain.entity.IpInfo;
 import com.ywt.user.domain.entity.User;
+import com.ywt.user.domain.enums.RoleEnum;
 import com.ywt.user.service.LoginService;
+import com.ywt.user.service.RoleService;
 import com.ywt.websocket.domain.dto.WSChannelExtraDTO;
+import com.ywt.websocket.domain.vo.message.WSBlack;
 import com.ywt.websocket.domain.vo.resp.WSBaseResp;
 import com.ywt.websocket.service.WebSocketService;
 import com.ywt.websocket.service.adapter.WebSocketAdapter;
@@ -21,7 +26,10 @@ import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -66,10 +74,17 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
+    @Autowired
+    private RoleService roleService;
+
     /**
      * 所有已连接的websocket连接列表和一些额外参数(已经登录的用户) channel -> user
      */
     private static final ConcurrentHashMap<Channel, WSChannelExtraDTO> ONLINE_WS_MAP = new ConcurrentHashMap<>();
+
+    @Autowired
+    @Qualifier(ThreadPoolConfig.WS_EXECUTOR)
+    private ThreadPoolTaskExecutor threadPoolTaskExecutor;
 
 
     @Override
@@ -81,7 +96,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         // //请求微信接口，获取登录码地址，生成带有code的二维码
         WxMpQrCodeTicket wxMpQrCodeTicket;
         try {
-            wxMpQrCodeTicket = wxMpService.getQrcodeService().qrCodeCreateTmpTicket(code, (int)EXPIRE_TIME.getSeconds() * 5);
+            wxMpQrCodeTicket = wxMpService.getQrcodeService().qrCodeCreateTmpTicket(code, (int) EXPIRE_TIME.getSeconds() * 5);
         } catch (WxErrorException e) {
             throw new RuntimeException(e);
         }
@@ -91,7 +106,7 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Override
     public void connect(Channel channel) {
-        ONLINE_WS_MAP.put(channel,new WSChannelExtraDTO());
+        ONLINE_WS_MAP.put(channel, new WSChannelExtraDTO());
     }
 
     @Override
@@ -105,7 +120,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         if (channel == null) {
             return;
         }
-        sendMsg(channel,WebSocketAdapter.buildScanSuccessResp());
+        sendMsg(channel, WebSocketAdapter.buildScanSuccessResp());
     }
 
     @Override
@@ -119,7 +134,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         // 删除code -》 channel
         WAIT_LOGIN_MAP.invalidate(code);
         // 认证
-        loginSuccess(channel,user,token);
+        loginSuccess(channel, user, token);
     }
 
     @Override
@@ -127,29 +142,37 @@ public class WebSocketServiceImpl implements WebSocketService {
         Long validUid = loginService.getValidUid(token);
         if (ObjUtil.isNull(validUid)) {
             // 登录token失效，给前端返回删除token信息
-            sendMsg(channel,WebSocketAdapter.buildLoginLose());
+            sendMsg(channel, WebSocketAdapter.buildLoginLose());
             return;
         }
         User user = userDao.getById(validUid);
         // token 有效，登录成功
-        loginSuccess(channel,user,token);
+        loginSuccess(channel, user, token);
 
     }
 
-    private void loginSuccess(Channel channel, User user,String token) {
+    @Override
+    public void sendBlackMsg(WSBaseResp<WSBlack> wsBlackWSBaseResp) {
+        ONLINE_WS_MAP.forEach(((channel, wsChannelExtraDTO)
+                -> threadPoolTaskExecutor.execute(() -> sendMsg(channel, wsBlackWSBaseResp))
+        ));
+    }
+
+    private void loginSuccess(Channel channel, User user, String token) {
         WSChannelExtraDTO wsChannelExtraDTO = new WSChannelExtraDTO();
         wsChannelExtraDTO.setUid(user.getId());
         // ，建立连接 channel -> uid
-        ONLINE_WS_MAP.put(channel,wsChannelExtraDTO);
+        ONLINE_WS_MAP.put(channel, wsChannelExtraDTO);
         // 获取ip
         String ip = NettyUtil.getAttr(channel, NettyUtil.IP);
         user.setLastOptTime(new Date());
         // 刷新用户的ip地址
         user.refreshIp(ip);
         // 登录成功发送消息，进行ip解析
-        applicationEventPublisher.publishEvent(new UserOnlineEvent(this,user));
+        applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
+        boolean hasPower = roleService.hasPower(user.getId(), RoleEnum.CHAT_MANAGER);
         // 发送登录成功的信息
-        sendMsg(channel,WebSocketAdapter.buildLoginSuccessResp(user,token));
+        sendMsg(channel, WebSocketAdapter.buildLoginSuccessResp(user, token, hasPower));
     }
 
 

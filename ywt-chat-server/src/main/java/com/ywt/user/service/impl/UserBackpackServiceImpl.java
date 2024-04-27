@@ -5,6 +5,7 @@ import com.ywt.common.annotation.RedissonLock;
 import com.ywt.common.domain.enums.YesOrNoEnum;
 import com.ywt.common.service.LockService;
 import com.ywt.common.utils.AssertUtil;
+import com.ywt.user.cache.ItemCache;
 import com.ywt.user.dao.ItemConfigDao;
 import com.ywt.user.dao.UserBackpackDao;
 import com.ywt.user.domain.entity.ItemConfig;
@@ -34,6 +35,9 @@ public class UserBackpackServiceImpl implements UserBackpackService {
     private ItemConfigDao itemConfigDao;
 
     @Autowired
+    private ItemCache itemCache;
+
+    @Autowired
     @Lazy
     private UserBackpackServiceImpl userBackpackService;
 
@@ -52,7 +56,7 @@ public class UserBackpackServiceImpl implements UserBackpackService {
             return;
         }
         // 业务检查,勋章只能颁发一次
-        ItemConfig itemConfig = itemConfigDao.getById(itemId);
+        ItemConfig itemConfig = itemCache.getById(itemId);
         if (ItemTypeEnum.BADGE.getType().equals(itemConfig.getType())) {
             Integer count = userBackpackDao.getCountByValidItem(uid, itemId);
             if (count > 0) {

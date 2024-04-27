@@ -1,6 +1,7 @@
 package com.ywt.user.dao;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ywt.common.domain.enums.YesOrNoEnum;
 import com.ywt.user.domain.entity.User;
 import com.ywt.user.mapper.UserMapper;
 import com.ywt.user.service.UserService;
@@ -31,6 +32,15 @@ public class UserDao extends ServiceImpl<UserMapper, User> {
         lambdaUpdate()
                 .eq(User::getId,uid)
                 .set(User::getName,newName)
+                .update();
+    }
+
+    /**
+     * 将数据库的用户状态改为拉黑
+     */
+    public void invalidUid(Long id) {
+        lambdaUpdate().eq(User::getId,id)
+                .set(User::getStatus, YesOrNoEnum.YES.getCode())
                 .update();
     }
 }

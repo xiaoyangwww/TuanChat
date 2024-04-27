@@ -1,7 +1,9 @@
 package com.ywt.websocket.service.adapter;
 
+import com.ywt.common.domain.enums.YesOrNoEnum;
 import com.ywt.user.domain.entity.User;
 import com.ywt.websocket.domain.enums.WSRespTypeEnum;
+import com.ywt.websocket.domain.vo.message.WSBlack;
 import com.ywt.websocket.domain.vo.message.WSLoginSuccess;
 import com.ywt.websocket.domain.vo.message.WSLoginUrl;
 import com.ywt.websocket.domain.vo.message.WSMessage;
@@ -18,6 +20,7 @@ public class WebSocketAdapter {
 
     /**
      * 封装登录的消息
+     *
      * @param wxMpQrCodeTicket 二维码信息
      * @return
      */
@@ -31,6 +34,7 @@ public class WebSocketAdapter {
 
     /**
      * 封装，已经扫码，等待授权的消息
+     *
      * @return
      */
     public static WSBaseResp<?> buildScanSuccessResp() {
@@ -42,12 +46,13 @@ public class WebSocketAdapter {
     /**
      * 封装，已经授权成功，登录成功的消息
      */
-    public static WSBaseResp<?> buildLoginSuccessResp(User user, String token) {
+    public static WSBaseResp<?> buildLoginSuccessResp(User user, String token, boolean hasPower) {
         WSBaseResp<WSLoginSuccess> wsLoginSuccessWSBaseResp = new WSBaseResp<>();
         wsLoginSuccessWSBaseResp.setData(WSLoginSuccess.builder()
                 .uid(user.getId())
                 .avatar(user.getAvatar())
                 .name(user.getName())
+                .power(hasPower ? YesOrNoEnum.YES.getCode() : YesOrNoEnum.NO.getCode())
                 .token(token)
                 .build());
         wsLoginSuccessWSBaseResp.setType(WSRespTypeEnum.LOGIN_SUCCESS.getType());
@@ -55,12 +60,21 @@ public class WebSocketAdapter {
     }
 
     /**
-     *  登录token失效，给前端返回删除token信息
+     * 登录token失效，给前端返回删除token信息
      */
     public static WSBaseResp<?> buildLoginLose() {
         WSBaseResp<WSMessage> message = new WSBaseResp<>();
         message.setType(WSRespTypeEnum.INVALIDATE_TOKEN.getType());
         return message;
+    }
+
+    public static WSBaseResp<WSBlack> buildBlackResp(User user) {
+        WSBaseResp<WSBlack> wsBlackWSBaseResp = new WSBaseResp<>();
+        wsBlackWSBaseResp.setType(WSRespTypeEnum.BLACK.getType());
+        WSBlack wsBlack = new WSBlack();
+        wsBlack.setUid(user.getId());
+        wsBlackWSBaseResp.setData(wsBlack);
+        return wsBlackWSBaseResp;
     }
 }
 

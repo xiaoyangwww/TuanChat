@@ -1,6 +1,8 @@
 package com.ywt.websocket.service;
 
 import com.ywt.user.domain.entity.User;
+import com.ywt.websocket.domain.vo.message.WSBlack;
+import com.ywt.websocket.domain.vo.resp.WSBaseResp;
 import io.netty.channel.Channel;
 
 public interface WebSocketService {
@@ -36,4 +38,10 @@ public interface WebSocketService {
      * 登录认证，保持登录状态
      */
     void handleAuthorize(Channel channel, String token);
+
+
+    /**
+     * 发送用户被拉黑信息
+     */
+    void sendBlackMsg(WSBaseResp<WSBlack> wsBlackWSBaseResp);
 }
