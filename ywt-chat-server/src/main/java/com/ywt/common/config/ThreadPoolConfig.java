@@ -1,7 +1,7 @@
-package com.ywt.config;
+package com.ywt.common.config;
 
 
-import com.ywt.thread.MyThreadFactory;
+import com.ywt.common.thread.MyThreadFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;

@@ -1,4 +1,4 @@
-package com.ywt.thread;
+package com.ywt.common.thread;
 
 import lombok.AllArgsConstructor;
 

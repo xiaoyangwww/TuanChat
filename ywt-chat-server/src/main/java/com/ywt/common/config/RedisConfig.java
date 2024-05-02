@@ -1,4 +1,4 @@
-package com.ywt.config;
+package com.ywt.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;

@@ -1,4 +1,4 @@
-package com.ywt.config;
+package com.ywt.common.config;
 
 import com.ywt.common.interceptor.BlackInterceptor;
 import com.ywt.common.interceptor.CollectorInterceptor;
