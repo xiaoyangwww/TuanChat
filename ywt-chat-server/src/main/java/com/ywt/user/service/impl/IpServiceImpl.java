@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.ywt.common.handler.GlobalUncaughtExceptionHandler;
+import com.ywt.user.cache.UserCache;
 import com.ywt.user.dao.UserDao;
 import com.ywt.user.domain.dto.IpResult;
 import com.ywt.user.domain.entity.IpDetail;
@@ -45,6 +46,9 @@ public class IpServiceImpl implements IpService, DisposableBean {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private UserCache userCache;
+
 
     @Override
     public void refreshIpDetailAsync(Long uid) {
@@ -68,6 +72,8 @@ public class IpServiceImpl implements IpService, DisposableBean {
             update.setId(uid);
             update.setIpInfo(ipInfo);
             userDao.updateById(update);
+            //删除缓存
+            userCache.userInfoChange(uid);
         });
 
     }

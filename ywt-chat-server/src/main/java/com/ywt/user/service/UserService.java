@@ -1,8 +1,13 @@
 package com.ywt.user.service;
 
+import com.ywt.user.domain.dto.ItemInfoDTO;
+import com.ywt.user.domain.dto.SummeryInfoDTO;
 import com.ywt.user.domain.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.ywt.user.domain.vo.Req.user.ItemInfoReq;
 import com.ywt.user.domain.vo.Req.user.ModifyNameReq;
+import com.ywt.user.domain.vo.Req.user.SummeryInfoReq;
+import com.ywt.user.domain.vo.Req.user.WearingBadgeReq;
 import com.ywt.user.domain.vo.Resp.user.BadgeResp;
 import com.ywt.user.domain.vo.Resp.user.UserInfoResp;
 
@@ -43,4 +48,26 @@ public interface UserService {
      * @param uid
      */
     void black(Long uid);
+
+    /**
+     * 用户聚合信息-返回的代表需要刷新的
+     * @param req
+     * @return
+     */
+    List<SummeryInfoDTO> getSummeryUserInfo(SummeryInfoReq req);
+
+    /**
+     * 佩戴徽章
+     * @param uid
+     * @param req
+     */
+    void wearingBadge(Long uid, WearingBadgeReq req);
+
+    /**
+     * 徽章聚合信息-返回的代表需要刷新的
+     * @param req
+     * @return
+     */
+    List<ItemInfoDTO> getItemInfo(ItemInfoReq req);
+
 }

@@ -28,4 +28,5 @@ public class ItemConfigDao extends ServiceImpl<ItemConfigMapper, ItemConfig>  {
         return lambdaQuery().eq(ItemConfig::getType, type).list();
 
     }
+
 }

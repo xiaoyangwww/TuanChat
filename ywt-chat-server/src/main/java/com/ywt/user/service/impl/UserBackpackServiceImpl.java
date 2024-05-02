@@ -3,6 +3,8 @@ package com.ywt.user.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import com.ywt.common.annotation.RedissonLock;
 import com.ywt.common.domain.enums.YesOrNoEnum;
+import com.ywt.common.event.ItemReceiveEvent;
+import com.ywt.common.event.UserBlackEvent;
 import com.ywt.common.service.LockService;
 import com.ywt.common.utils.AssertUtil;
 import com.ywt.user.cache.ItemCache;
@@ -16,6 +18,7 @@ import com.ywt.user.service.UserBackpackService;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +43,9 @@ public class UserBackpackServiceImpl implements UserBackpackService {
     @Autowired
     @Lazy
     private UserBackpackServiceImpl userBackpackService;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
 
     @Override
@@ -71,6 +77,8 @@ public class UserBackpackServiceImpl implements UserBackpackService {
                 .status(YesOrNoEnum.NO.getCode())
                 .build();
         userBackpackDao.save(userBack);
+        //用户收到物品的事件
+        applicationEventPublisher.publishEvent(new ItemReceiveEvent(this,userBack));
     }
 
 
