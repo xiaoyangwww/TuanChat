@@ -3,9 +3,17 @@ package com.ywt.chat.domain.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serializable;
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ywt.chat.domain.enums.HotFlagEnum;
+import com.ywt.chat.domain.enums.RoomTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -27,7 +35,7 @@ public class Room implements Serializable {
     /**
      * id
      */
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -46,7 +54,7 @@ public class Room implements Serializable {
      * 群最后消息的更新时间（热点群不需要写扩散，只更新这里）
      */
     @TableField("active_time")
-    private LocalDateTime activeTime;
+    private Date activeTime;
 
     /**
      * 会话中的最后一条消息id
@@ -64,13 +72,28 @@ public class Room implements Serializable {
      * 创建时间
      */
     @TableField("create_time")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 修改时间
      */
     @TableField("update_time")
-    private LocalDateTime updateTime;
+    private Date updateTime;
+
+    @JsonIgnore
+    public boolean isHotRoom() {
+        return HotFlagEnum.of(this.hotFlag) == HotFlagEnum.YES;
+    }
+
+    @JsonIgnore
+    public boolean isRoomFriend() {
+        return RoomTypeEnum.of(this.type) == RoomTypeEnum.FRIEND;
+    }
+
+    @JsonIgnore
+    public boolean isRoomGroup() {
+        return RoomTypeEnum.of(this.type) == RoomTypeEnum.GROUP;
+    }
 
 
 }

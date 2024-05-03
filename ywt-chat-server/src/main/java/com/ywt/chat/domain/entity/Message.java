@@ -6,8 +6,11 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import java.util.Date;
+
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.ywt.chat.domain.entity.msg.MessageExtra;
+import lombok.*;
 
 /**
  * <p>
@@ -20,6 +23,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("message")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Message implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -73,22 +79,22 @@ public class Message implements Serializable {
     private Integer type;
 
     /**
-     * 扩展信息
+     * 消息扩展字段
      */
-    @TableField("extra")
-    private String extra;
+    @TableField(value = "extra", typeHandler = JacksonTypeHandler.class)
+    private MessageExtra extra;
 
     /**
      * 创建时间
      */
     @TableField("create_time")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 修改时间
      */
     @TableField("update_time")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
 
 }
