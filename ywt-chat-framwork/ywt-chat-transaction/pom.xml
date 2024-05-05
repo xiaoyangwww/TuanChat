@@ -5,16 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.ywt</groupId>
-        <artifactId>ywt-chat-main</artifactId>
+        <artifactId>ywt-chat-framwork</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>ywt-chat-framwork</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>ywt-chat-common-starter</module>
-        <module>ywt-chat-transaction</module>
-    </modules>
+    <artifactId>ywt-chat-transaction</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>com.ywt</groupId>
+            <artifactId>ywt-chat-common-starter</artifactId>
+        </dependency>
+    </dependencies>
 
 
 </project>
