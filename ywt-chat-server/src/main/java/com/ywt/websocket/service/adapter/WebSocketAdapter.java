@@ -1,12 +1,10 @@
 package com.ywt.websocket.service.adapter;
 
+import com.ywt.chat.domain.vo.Resp.ChatMessageResp;
 import com.ywt.common.domain.enums.YesOrNoEnum;
 import com.ywt.user.domain.entity.User;
 import com.ywt.websocket.domain.enums.WSRespTypeEnum;
-import com.ywt.websocket.domain.vo.message.WSBlack;
-import com.ywt.websocket.domain.vo.message.WSLoginSuccess;
-import com.ywt.websocket.domain.vo.message.WSLoginUrl;
-import com.ywt.websocket.domain.vo.message.WSMessage;
+import com.ywt.websocket.domain.vo.message.*;
 import com.ywt.websocket.domain.vo.resp.WSBaseResp;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 
@@ -75,6 +73,20 @@ public class WebSocketAdapter {
         wsBlack.setUid(user.getId());
         wsBlackWSBaseResp.setData(wsBlack);
         return wsBlackWSBaseResp;
+    }
+
+    public static WSBaseResp<?> buildPushMsg(ChatMessageResp msgResp) {
+        WSBaseResp<ChatMessageResp> chatMessageRespWSBaseResp = new WSBaseResp<>();
+        chatMessageRespWSBaseResp.setType(WSRespTypeEnum.MESSAGE.getType());
+        chatMessageRespWSBaseResp.setData(msgResp);
+        return chatMessageRespWSBaseResp;
+    }
+
+    public static WSBaseResp<?> buildApplySend(WSFriendApply wsFriendApply) {
+        WSBaseResp<WSFriendApply> wsFriendApplyWSBaseResp = new WSBaseResp<>();
+        wsFriendApplyWSBaseResp.setType(WSRespTypeEnum.APPLY.getType());
+        wsFriendApplyWSBaseResp.setData(wsFriendApply);
+        return wsFriendApplyWSBaseResp;
     }
 }
 

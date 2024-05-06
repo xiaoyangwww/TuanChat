@@ -4,20 +4,24 @@ package com.ywt.chat.controller;
 import com.ywt.chat.domain.vo.Req.ChatMessageReq;
 import com.ywt.chat.domain.vo.Resp.ChatMessageResp;
 import com.ywt.chat.service.ChatService;
+import com.ywt.common.domain.vo.Req.ChatMessagePageReq;
 import com.ywt.common.domain.vo.Resp.ApiResult;
+import com.ywt.common.domain.vo.Resp.CursorPageBaseResp;
 import com.ywt.common.utils.RequestHolder;
+import com.ywt.user.cache.UserCache;
+import com.ywt.user.domain.enums.BlackTypeEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -36,6 +40,27 @@ public class ChatController {
     @Autowired
     private ChatService chatService;
 
+    @Autowired
+    private UserCache userCache;
+
+
+    @GetMapping("/public/msg/page")
+    @ApiOperation("消息列表")
+    public ApiResult<CursorPageBaseResp<ChatMessageResp>> getMsgPage(@Valid ChatMessagePageReq request) {
+        CursorPageBaseResp<ChatMessageResp> msgPage = chatService.getMsgPage(request, RequestHolder.get().getUid());
+        // 过滤被拉黑的用户消息
+        filterBlackMsg(msgPage);
+        return ApiResult.success(msgPage);
+    }
+
+    private Set<String> getBlackUidSet() {
+        return userCache.getBlackMap().getOrDefault(BlackTypeEnum.UID.getType(), new HashSet<>());
+    }
+
+    private void filterBlackMsg(CursorPageBaseResp<ChatMessageResp> msgPage) {
+        Set<String> blackUidSet = getBlackUidSet();
+        msgPage.getList().removeIf(item -> blackUidSet.contains(item.getFromUser().getUid().toString()));
+    }
 
 
     @PostMapping("/msg")

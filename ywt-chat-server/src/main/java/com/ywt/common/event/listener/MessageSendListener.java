@@ -4,7 +4,11 @@ package com.ywt.common.event.listener;
 import com.sun.xml.internal.bind.v2.TODO;
 import com.ywt.chat.domain.entity.Message;
 import com.ywt.chat.domain.entity.Room;
+import com.ywt.chat.transaction.service.MQProducer;
+import com.ywt.common.constant.MQConstant;
+import com.ywt.common.domain.dto.MsgSendMessageDTO;
 import com.ywt.common.event.MessageSendEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -18,11 +22,14 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 public class MessageSendListener {
 
+    @Autowired
+    private MQProducer mqProducer;
+
+
     @TransactionalEventListener(classes = MessageSendEvent.class,phase = TransactionPhase.BEFORE_COMMIT,fallbackExecution = true)
     public void messageRoute(MessageSendEvent event) {
         Long msgId = event.getMsgId();
-        // TODO 发送MQ
-        System.out.println( msgId + "发送MQ" );
+        mqProducer.sendSecureMsg(MQConstant.SEND_MSG_TOPIC,new MsgSendMessageDTO(msgId),msgId);
     }
 
     @TransactionalEventListener(classes = MessageSendEvent.class, fallbackExecution = true)

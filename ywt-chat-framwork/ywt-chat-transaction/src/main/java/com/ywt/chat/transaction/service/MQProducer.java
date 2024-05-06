@@ -1,6 +1,7 @@
 package com.ywt.chat.transaction.service;
 
 
+import cn.hutool.core.util.RandomUtil;
 import com.ywt.chat.transaction.annotation.SecureInvoke;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,7 @@
 package com.ywt.websocket.service.impl;
 
 import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -20,6 +21,7 @@ import com.ywt.websocket.service.WebSocketService;
 import com.ywt.websocket.service.adapter.WebSocketAdapter;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
@@ -32,6 +34,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 功能描述
@@ -40,6 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date: 2024年04月18日 21:59
  */
 @Service
+@Slf4j
 public class WebSocketServiceImpl implements WebSocketService {
 
     /**
@@ -78,6 +82,11 @@ public class WebSocketServiceImpl implements WebSocketService {
      * 所有已连接的websocket连接列表和一些额外参数(已经登录的用户) channel -> user
      */
     private static final ConcurrentHashMap<Channel, WSChannelExtraDTO> ONLINE_WS_MAP = new ConcurrentHashMap<>();
+
+    /**
+     * 所有在线的用户和对应的socket
+     */
+    private static final ConcurrentHashMap<Long, CopyOnWriteArrayList<Channel>> ONLINE_UID_MAP = new ConcurrentHashMap<>();
 
     @Autowired
     @Qualifier(ThreadPoolConfig.WS_EXECUTOR)
@@ -155,21 +164,58 @@ public class WebSocketServiceImpl implements WebSocketService {
         ));
     }
 
+    @Override
+    public void sendToAllOnline(WSBaseResp<?> wsBaseMsg, Long skipUid) {
+        ONLINE_WS_MAP.forEach(((channel, wsChannelExtraDTO) -> {
+            if (ObjectUtil.isNotNull(skipUid) && wsChannelExtraDTO.getUid().equals(skipUid)) {
+                return;
+            }
+            threadPoolTaskExecutor.execute(() -> sendMsg(channel,wsBaseMsg));
+        }));
+    }
+
+    @Override
+    public void sendToUid(WSBaseResp<?> wsBaseMsg, Long uid) {
+        CopyOnWriteArrayList<Channel> channels = ONLINE_UID_MAP.get(uid);
+        if (channels.isEmpty()) {
+            log.info("用户：{}不在线", uid);
+            return;
+        }
+        channels.forEach(channel -> threadPoolTaskExecutor.execute(() -> sendMsg(channel, wsBaseMsg)));
+    }
+
     private void loginSuccess(Channel channel, User user, String token) {
-        WSChannelExtraDTO wsChannelExtraDTO = new WSChannelExtraDTO();
-        wsChannelExtraDTO.setUid(user.getId());
-        // ，建立连接 channel -> uid
-        ONLINE_WS_MAP.put(channel, wsChannelExtraDTO);
-        // 获取ip
-        String ip = NettyUtil.getAttr(channel, NettyUtil.IP);
+        //更新上线列表
+        online(channel, user.getId());
         user.setLastOptTime(new Date());
         // 刷新用户的ip地址
-        user.refreshIp(ip);
+        user.refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));
         // 登录成功发送消息，进行ip解析
         applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
         boolean hasPower = roleService.hasPower(user.getId(), RoleEnum.CHAT_MANAGER);
         // 发送登录成功的信息
         sendMsg(channel, WebSocketAdapter.buildLoginSuccessResp(user, token, hasPower));
+    }
+
+    private void online(Channel channel, Long uid) {
+        // ，建立连接 channel -> uid
+        getOrInitChannelExt(channel,uid).setUid(uid);
+        ONLINE_UID_MAP.putIfAbsent(uid,new CopyOnWriteArrayList<>());
+        ONLINE_UID_MAP.get(uid).add(channel);
+        NettyUtil.setAttr(channel, NettyUtil.UID, uid);
+    }
+
+    /**
+     * 如果在线列表不存在，就先把该channel放进在线列表
+     *
+     * @param channel
+     * @return
+     */
+    private WSChannelExtraDTO getOrInitChannelExt(Channel channel, Long uid) {
+        WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.getOrDefault(channel, new WSChannelExtraDTO());
+        //如果该键已经存在，则不会进行任何操作，并返回之前与该键相关联的值。
+        WSChannelExtraDTO old = ONLINE_WS_MAP.putIfAbsent(channel, wsChannelExtraDTO);
+        return ObjectUtil.isNull(old) ? wsChannelExtraDTO : old;
     }
 
 

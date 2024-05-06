@@ -53,7 +53,7 @@ public class SecureInvokeAspect {
         // 有序获取方法参数的类型
         List<String> parameters = Stream.of(method.getParameterTypes()).map(Class::getName).collect(Collectors.toList());
         SecureInvokeDTO secureInvokeDTO = SecureInvokeDTO.builder()
-                .args(JsonUtils.toStr(joinPoint.getArgs())) // 参数json
+                .args(JsonUtils.toStr(joinPoint.getArgs())) // 保存方法调用时具体参数的值json
                 .className(method.getDeclaringClass().getName()) // 类名
                 .methodName(method.getName()) // 方法名
                 .parameterTypes(JsonUtils.toStr(parameters)) // 参数类型 json

@@ -44,4 +44,16 @@ public interface WebSocketService {
      * 发送用户被拉黑信息
      */
     void sendBlackMsg(WSBaseResp<WSBlack> wsBlackWSBaseResp);
+
+    /**
+     * 热点群聊消息，发送给全部在线用户
+     * @param wsBaseMsg 发送的消息体
+     * @param skipUid    需要跳过的人
+     */
+    void sendToAllOnline(WSBaseResp<?> wsBaseMsg, Long skipUid);
+
+    /**
+     * 普通群聊消息，发给相关在线用户
+     */
+    void sendToUid(WSBaseResp<?> wsBaseMsg, Long uid);
 }

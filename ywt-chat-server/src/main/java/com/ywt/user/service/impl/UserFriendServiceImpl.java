@@ -5,6 +5,13 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
+import com.ywt.chat.dao.RoomFriendDao;
+import com.ywt.chat.domain.entity.RoomFriend;
+import com.ywt.chat.domain.enums.MessageTypeEnum;
+import com.ywt.chat.domain.vo.Req.ChatMessageReq;
+import com.ywt.chat.service.ChatService;
+import com.ywt.chat.service.RoomService;
+import com.ywt.chat.service.adapter.MessageAdapter;
 import com.ywt.common.annotation.RedissonLock;
 import com.ywt.common.domain.vo.Req.CursorPageBaseReq;
 import com.ywt.common.domain.vo.Req.PageBaseReq;
@@ -37,10 +44,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.ywt.user.domain.enums.ApplyStatusEnum.WAIT_APPROVAL;
@@ -70,6 +74,12 @@ public class UserFriendServiceImpl implements UserFriendService {
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    private RoomService roomService;
+
+    @Autowired
+    private ChatService chatService;
 
     @Override
     public CursorPageBaseResp<FriendResp> friendList(Long uid, CursorPageBaseReq cursorPageBaseReq) {
@@ -141,7 +151,10 @@ public class UserFriendServiceImpl implements UserFriendService {
         userApplyDao.agree(friendApproveReq.getApplyId());
         // 创建好友关系
         createFriend(uid,userApply.getUid());
-        // TODO 创建聊天室, 发送第一条信息
+        // 创建聊天室
+        RoomFriend roomFriend = roomService.createRoomFriend(Arrays.asList(uid, userApply.getUid()));
+        // 发送第一条信息
+        chatService.sendMsg(MessageAdapter.buildAgreeMsg(roomFriend.getRoomId()),uid);
     }
 
     @Override
@@ -153,9 +166,11 @@ public class UserFriendServiceImpl implements UserFriendService {
             return;
         }
         friendDao.removeByIds(userFriends);
-        // TODO 禁用聊天
+        // 禁用房间
+        roomService.disableChat(Arrays.asList(uid,friendUid));
 
     }
+
 
     @Override
     public FriendUnreadResp unread(Long uid) {

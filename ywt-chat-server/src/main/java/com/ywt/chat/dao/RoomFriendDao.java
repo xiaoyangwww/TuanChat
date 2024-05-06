@@ -1,10 +1,9 @@
 package com.ywt.chat.dao;
 
 import com.ywt.chat.domain.entity.RoomFriend;
-import com.ywt.chat.domain.entity.RoomGroup;
 import com.ywt.chat.mapper.RoomFriendMapper;
-import com.ywt.chat.service.RoomFriendService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ywt.common.domain.enums.NormalOrNoEnum;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,5 +23,31 @@ public class RoomFriendDao extends ServiceImpl<RoomFriendMapper, RoomFriend> {
         return lambdaQuery()
                 .in(RoomFriend::getRoomId,roomIds)
                 .list();
+    }
+
+    public RoomFriend getByRoomId(Long roomId) {
+        return lambdaQuery()
+                .eq(RoomFriend::getRoomId, roomId)
+                .one();
+    }
+
+    public RoomFriend getByRoomKey(String key) {
+        return lambdaQuery()
+                .eq(RoomFriend::getRoomKey, key)
+                .one();
+    }
+
+    public void restoreRoom(Long id) {
+        lambdaUpdate()
+                .set(RoomFriend::getStatus, NormalOrNoEnum.NORMAL.getStatus())
+                .eq(RoomFriend::getId,id)
+                .update();
+    }
+
+    public void disableRoom(Long id) {
+        lambdaUpdate()
+                .set(RoomFriend::getStatus, NormalOrNoEnum.NOT_NORMAL.getStatus())
+                .eq(RoomFriend::getId,id)
+                .update();
     }
 }
