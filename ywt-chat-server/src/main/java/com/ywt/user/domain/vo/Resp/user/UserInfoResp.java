@@ -6,7 +6,7 @@ import lombok.Data;
 
 /**
  * Description: 用户信息返回
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-03-22
  */
 @Data

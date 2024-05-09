@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * Description: 游标分页工具类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-03-28
  */
 public class CursorUtils {

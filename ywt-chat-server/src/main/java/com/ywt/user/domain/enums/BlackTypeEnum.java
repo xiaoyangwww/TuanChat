@@ -5,7 +5,7 @@ import lombok.Getter;
 
 /**
  * Description: 物品枚举
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-03-19
  */
 @AllArgsConstructor

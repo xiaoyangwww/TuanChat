@@ -1,6 +1,7 @@
 package com.ywt.chat.service;
 
 import com.ywt.chat.domain.entity.Message;
+import com.ywt.chat.domain.vo.Req.ChatMessageBaseReq;
 import com.ywt.chat.domain.vo.Req.ChatMessageReq;
 import com.ywt.chat.domain.vo.Resp.ChatMessageResp;
 import com.ywt.common.domain.vo.Req.ChatMessagePageReq;
@@ -38,4 +39,11 @@ public interface ChatService {
      * @return
      */
     CursorPageBaseResp<ChatMessageResp> getMsgPage(ChatMessagePageReq request, Long uid);
+
+    /**
+     * 撤回消息
+     * @param uid
+     * @param request
+     */
+    void recallMsg(Long uid, ChatMessageBaseReq request);
 }

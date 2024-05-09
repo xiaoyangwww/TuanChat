@@ -21,4 +21,8 @@ public enum YesOrNoEnum {
     private final Integer code;
 
     private final String mess;
+
+    public static Integer toStatus(boolean b) {
+        return b ? YES.code : NO.code;
+    }
 }

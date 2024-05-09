@@ -32,4 +32,15 @@ public class MessageDao extends ServiceImpl<MessageMapper, Message> {
                 Message::getId
         );
     }
+
+    /**
+     * 查询要回复的信息与当前信息的间隔数
+     */
+    public Integer getGapCount(Long roomId, Long replyMsgId, Long msgId) {
+        return lambdaQuery()
+                .le(Message::getId,msgId)
+                .gt(Message::getId,replyMsgId)
+                .eq(Message::getRoomId,roomId)
+                .count();
+    }
 }

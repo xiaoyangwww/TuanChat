@@ -15,7 +15,7 @@ import java.util.Map;
 
 /**
  * Description: 消息扩展属性
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-05-28
  */
 @Data

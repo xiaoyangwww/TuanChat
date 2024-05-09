@@ -6,7 +6,9 @@ import com.ywt.chat.domain.entity.Message;
 import com.ywt.chat.domain.entity.msg.MessageExtra;
 import com.ywt.chat.domain.entity.msg.MsgRecall;
 import com.ywt.chat.domain.enums.MessageTypeEnum;
+import com.ywt.common.event.MessageRecallEvent;
 import com.ywt.user.cache.UserCache;
+import com.ywt.user.domain.dto.ChatMsgRecallDTO;
 import com.ywt.user.domain.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,7 +19,7 @@ import java.util.Objects;
 
 /**
  * Description: 撤回文本消息
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-06-04
  */
 @Component
@@ -26,8 +28,7 @@ public class RecallMsgHandler extends AbstractMsgHandler<Object> {
     private MessageDao messageDao;
     @Autowired
     private UserCache userCache;
-//    @Autowired
-//    private MsgCache msgCache;
+
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
@@ -56,17 +57,17 @@ public class RecallMsgHandler extends AbstractMsgHandler<Object> {
         return "原消息已被撤回";
     }
 
-//    public void recall(Long recallUid, Message message) {//todo 消息覆盖问题用版本号解决
-//        MessageExtra extra = message.getExtra();
-//        extra.setRecall(new MsgRecall(recallUid, new Date()));
-//        Message update = new Message();
-//        update.setId(message.getId());
-//        update.setType(MessageTypeEnum.RECALL.getType());
-//        update.setExtra(extra);
-//        messageDao.updateById(update);
-//        applicationEventPublisher.publishEvent(new MessageRecallEvent(this, new ChatMsgRecallDTO(message.getId(), message.getRoomId(), recallUid)));
-//
-//    }
+    public void recall(Long recallUid, Message message) {//todo 消息覆盖问题用版本号解决
+        MessageExtra extra = message.getExtra();
+        extra.setRecall(new MsgRecall(recallUid, new Date()));
+        Message update = new Message();
+        update.setId(message.getId());
+        update.setType(MessageTypeEnum.RECALL.getType());
+        update.setExtra(extra);
+        messageDao.updateById(update);
+        applicationEventPublisher.publishEvent(new MessageRecallEvent(this, new ChatMsgRecallDTO(message.getId(), message.getRoomId(), recallUid)));
+
+    }
 
     @Override
     public String showContactMsg(Message msg) {

@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Description: 批量查询徽章详情
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-03-23
  */
 @Data

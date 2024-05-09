@@ -15,7 +15,7 @@ import java.lang.reflect.ParameterizedType;
 
 /**
  * Description: 消息处理器抽象类
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-06-04
  */
 public abstract class AbstractMsgHandler<Req> {

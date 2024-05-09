@@ -1,7 +1,9 @@
 package com.ywt.websocket.service.adapter;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.ywt.chat.domain.vo.Resp.ChatMessageResp;
 import com.ywt.common.domain.enums.YesOrNoEnum;
+import com.ywt.user.domain.dto.ChatMsgRecallDTO;
 import com.ywt.user.domain.entity.User;
 import com.ywt.websocket.domain.enums.WSRespTypeEnum;
 import com.ywt.websocket.domain.vo.message.*;
@@ -87,6 +89,15 @@ public class WebSocketAdapter {
         wsFriendApplyWSBaseResp.setType(WSRespTypeEnum.APPLY.getType());
         wsFriendApplyWSBaseResp.setData(wsFriendApply);
         return wsFriendApplyWSBaseResp;
+    }
+
+    public static WSBaseResp<?> buildRecallResp(ChatMsgRecallDTO chatMsgRecallDTO) {
+        WSBaseResp<WSMsgRecall> wsMsgRecallWSBaseResp = new WSBaseResp<>();
+        wsMsgRecallWSBaseResp.setType(WSRespTypeEnum.RECALL.getType());
+        WSMsgRecall wsMsgRecall = new WSMsgRecall();
+        BeanUtil.copyProperties(chatMsgRecallDTO,wsMsgRecall);
+        wsMsgRecallWSBaseResp.setData(wsMsgRecall);
+        return wsMsgRecallWSBaseResp;
     }
 }
 

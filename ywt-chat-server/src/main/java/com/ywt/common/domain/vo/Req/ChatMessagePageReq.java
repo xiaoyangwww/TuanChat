@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * Description: 消息列表请求
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-03-29
  */
 @Data

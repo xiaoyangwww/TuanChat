@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 /**
  * Description: 是否正常的通用枚举
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-03-19
  */
 @AllArgsConstructor

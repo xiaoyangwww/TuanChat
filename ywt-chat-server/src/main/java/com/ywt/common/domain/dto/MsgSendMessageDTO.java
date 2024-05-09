@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 /**
  * Description: 发送MQ的消息体
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-08-12
  */
 @Data

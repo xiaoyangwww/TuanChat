@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * Description:
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-08-02
  */
 public class LambdaUtils {

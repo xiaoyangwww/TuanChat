@@ -4,7 +4,7 @@ import java.util.Objects;
 
 /**
  * Description:
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-10-02
  */
 public class SecureInvokeHolder {

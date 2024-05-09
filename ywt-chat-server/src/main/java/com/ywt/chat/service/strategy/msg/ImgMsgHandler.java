@@ -13,7 +13,7 @@ import java.util.Optional;
 
 /**
  * Description:图片消息
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-06-04
  */
 @Component

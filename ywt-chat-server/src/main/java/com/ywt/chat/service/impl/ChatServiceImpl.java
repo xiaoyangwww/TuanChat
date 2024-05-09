@@ -2,8 +2,12 @@ package com.ywt.chat.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import com.ywt.chat.dao.*;
 import com.ywt.chat.domain.entity.*;
+import com.ywt.chat.domain.enums.MessageTypeEnum;
+import com.ywt.chat.domain.vo.Req.ChatMessageBaseReq;
 import com.ywt.chat.domain.vo.Req.ChatMessageReq;
 import com.ywt.chat.domain.vo.Resp.ChatMessageResp;
 import com.ywt.chat.mapper.RoomMapper;
@@ -14,12 +18,16 @@ import com.ywt.chat.service.cache.RoomFriendCache;
 import com.ywt.chat.service.cache.RoomGroupCache;
 import com.ywt.chat.service.strategy.msg.AbstractMsgHandler;
 import com.ywt.chat.service.strategy.msg.MsgHandlerFactory;
+import com.ywt.chat.service.strategy.msg.RecallMsgHandler;
 import com.ywt.common.domain.enums.NormalOrNoEnum;
 import com.ywt.common.domain.vo.Req.ChatMessagePageReq;
 import com.ywt.common.domain.vo.Req.CursorPageBaseReq;
 import com.ywt.common.domain.vo.Resp.CursorPageBaseResp;
 import com.ywt.common.event.MessageSendEvent;
 import com.ywt.common.utils.AssertUtil;
+import com.ywt.user.domain.enums.RoleEnum;
+import com.ywt.user.service.RoleService;
+import org.jsoup.helper.DataUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -63,6 +71,12 @@ public class ChatServiceImpl implements ChatService {
 
     @Autowired
     private MessageMarkDao messageMarkDao;
+
+    @Autowired
+    private RoleService roleService;
+
+    @Autowired
+    private RecallMsgHandler recallMsgHandler;
 
 
     /**
@@ -126,6 +140,27 @@ public class ChatServiceImpl implements ChatService {
             return CursorPageBaseResp.empty();
         }
         return CursorPageBaseResp.init(cursorPage, getMsgRespBatch(cursorPage.getList(), uid));
+    }
+
+    @Override
+    public void recallMsg(Long uid, ChatMessageBaseReq request) {
+        Message message = messageDao.getById(request.getMsgId());
+        //校验能不能执行撤回
+        checkRecall(message,uid,request.getRoomId());
+        //执行消息撤回
+        recallMsgHandler.recall(uid,message);
+    }
+
+    private void checkRecall(Message message, Long uid, Long roomId) {
+        AssertUtil.isNotEmpty(message,"消息有误");
+        AssertUtil.notEqual(message.getType(), MessageTypeEnum.RECALL.getType(),"消息无法撤回");
+        boolean hasPower = roleService.hasPower(uid, RoleEnum.ADMIN);
+        if (hasPower) {
+            return;
+        }
+        AssertUtil.equal(uid,message.getFromUid(),"您没有权限");
+        long between = DateUtil.between(message.getCreateTime(), new Date(), DateUnit.MINUTE);
+        AssertUtil.isTrue(between <= 2,"覆水难收，超过2分钟的消息不能撤回哦~~");
     }
 
     private List<ChatMessageResp> getMsgRespBatch(List<Message> messages, Long uid) {

@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  * Description:
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-03-19
  */
 @Data
@@ -27,7 +27,7 @@ public class WSMemberChange {
     @ApiModelProperty("变动类型 1加入群组 2移除群组")
     private Integer changeType;
     /**
-     * @see com.abin.mallchat.common.user.domain.enums.ChatActiveStatusEnum
+     * @see com.ywt.user.domain.enums.ChatActiveStatusEnum
      */
     @ApiModelProperty("在线状态 1在线 2离线")
     private Integer activeStatus;

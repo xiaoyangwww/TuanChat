@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * Description: 拉黑目标
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-03-23
  */
 @Data

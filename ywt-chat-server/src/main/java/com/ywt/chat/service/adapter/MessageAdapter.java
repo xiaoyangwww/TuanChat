@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 public class MessageAdapter {
 
 
+    public static final Integer CAN_CALLBACK_GAP_COUNT = 100;
+
     public static Message buildMsgSave(ChatMessageReq request, Long uid) {
         return Message.builder()
                 .fromUid(uid)

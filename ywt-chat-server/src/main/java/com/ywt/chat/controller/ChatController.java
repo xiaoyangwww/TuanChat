@@ -1,6 +1,7 @@
 package com.ywt.chat.controller;
 
 
+import com.ywt.chat.domain.vo.Req.ChatMessageBaseReq;
 import com.ywt.chat.domain.vo.Req.ChatMessageReq;
 import com.ywt.chat.domain.vo.Resp.ChatMessageResp;
 import com.ywt.chat.service.ChatService;
@@ -42,6 +43,14 @@ public class ChatController {
 
     @Autowired
     private UserCache userCache;
+
+
+    @PutMapping("/msg/recall")
+    @ApiOperation("撤回消息")
+    public ApiResult<Void> recall(@Valid @RequestBody ChatMessageBaseReq request) {
+         chatService.recallMsg(RequestHolder.get().getUid(),request);
+         return ApiResult.success();
+    }
 
 
     @GetMapping("/public/msg/page")

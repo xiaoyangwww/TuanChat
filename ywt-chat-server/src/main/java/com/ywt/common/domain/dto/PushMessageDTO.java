@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Description: 推送给用户的消息对象
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-08-12
  */
 @Data

@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 /**
  * Description: 用户所有信息的缓存
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-06-10
  */
 @Component

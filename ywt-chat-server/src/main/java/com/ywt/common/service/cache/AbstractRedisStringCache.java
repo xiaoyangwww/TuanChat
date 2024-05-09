@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 /**
  * Description: redis string类型的批量缓存框架
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-06-10
  */
 public abstract class AbstractRedisStringCache<IN, OUT> implements BatchCache<IN, OUT> {

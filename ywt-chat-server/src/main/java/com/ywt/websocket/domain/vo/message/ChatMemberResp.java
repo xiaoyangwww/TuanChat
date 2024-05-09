@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  * Description: 群成员列表的成员信息
- * Author: <a href="https://github.com/zongzibinbin">abin</a>
+ * Author: ywt
  * Date: 2023-03-23
  */
 @Data
