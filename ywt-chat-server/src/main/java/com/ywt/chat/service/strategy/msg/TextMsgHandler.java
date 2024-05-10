@@ -13,6 +13,7 @@ import com.ywt.chat.service.adapter.MessageAdapter;
 import com.ywt.chat.service.cache.MsgCache;
 import com.ywt.common.domain.enums.YesOrNoEnum;
 import com.ywt.common.utils.AssertUtil;
+import com.ywt.common.utils.discover.PrioritizedUrlDiscover;
 import com.ywt.user.cache.UserCache;
 import com.ywt.user.cache.UserInfoCache;
 import com.ywt.user.domain.entity.User;
@@ -47,7 +48,7 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgReq> {
 //    @Autowired
 //    private SensitiveWordBs sensitiveWordBs;
 
-//    private static final PrioritizedUrlDiscover URL_TITLE_DISCOVER = new PrioritizedUrlDiscover();
+    private static final PrioritizedUrlDiscover URL_TITLE_DISCOVER = new PrioritizedUrlDiscover();
 
     @Override
     MessageTypeEnum getMsgTypeEnum() {
@@ -95,8 +96,8 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgReq> {
 
         }
         //判断消息url跳转
-//        Map<String, UrlInfo> urlContentMap = URL_TITLE_DISCOVER.getUrlContentMap(body.getContent());
-//        extra.setUrlContentMap(urlContentMap);
+        Map<String, UrlInfo> urlContentMap = URL_TITLE_DISCOVER.getUrlContentMap(body.getContent());
+        extra.setUrlContentMap(urlContentMap);
         //艾特功能
         if (CollectionUtil.isNotEmpty(body.getAtUidList())) {
             extra.setAtUidList(body.getAtUidList());

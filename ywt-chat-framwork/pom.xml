@@ -14,6 +14,7 @@
     <modules>
         <module>ywt-chat-common-starter</module>
         <module>ywt-chat-transaction</module>
+        <module>ywt-chat-oss-stater</module>
     </modules>
 
 
