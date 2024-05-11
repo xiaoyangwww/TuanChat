@@ -63,9 +63,9 @@ public class UserController {
          return ApiResult.success();
     }
 
-    @GetMapping("/badge")
+    @GetMapping("/badges")
     @ApiOperation("可选徽章列表")
-    public ApiResult<List<BadgeResp>> badge() {
+    public ApiResult<List<BadgeResp>> badges() {
         return ApiResult.success(userService.badges(RequestHolder.get().getUid()));
     }
 

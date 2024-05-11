@@ -1,6 +1,7 @@
 package com.ywt.user.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.ywt.common.algorithm.sensitiveWord.SensitiveWordBs;
 import com.ywt.common.event.UserBlackEvent;
 import com.ywt.common.event.UserRegisterEvent;
 import com.ywt.common.utils.AssertUtil;
@@ -79,6 +80,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ItemConfigDao itemConfigDao;
 
+    @Autowired
+    private SensitiveWordBs sensitiveWordBs;
+
 
     @Override
     public Long register(User user) {
@@ -107,7 +111,7 @@ public class UserServiceImpl implements UserService {
         String newName = modifyNameReq.getName();
         Long uid = RequestHolder.get().getUid();
         // 判断名字中有没有敏感词
-//        AssertUtil.isFalse(sensitiveWordBs.hasSensitiveWord(modifyNameReq.getName()), "名字中包含敏感词，请重新输入");
+        AssertUtil.isFalse(sensitiveWordBs.hasSensitiveWord(modifyNameReq.getName()), "名字中包含敏感词，请重新输入");
         // 判断用户名是否重复
         User user = userDao.getUserByName(modifyNameReq.getName());
         AssertUtil.isEmpty(user, "名字已经被抢占了，请换一个哦~~");

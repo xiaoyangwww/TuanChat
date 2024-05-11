@@ -11,6 +11,7 @@ import com.ywt.chat.domain.vo.Req.msg.TextMsgReq;
 import com.ywt.chat.domain.vo.Resp.msg.TextMsgResp;
 import com.ywt.chat.service.adapter.MessageAdapter;
 import com.ywt.chat.service.cache.MsgCache;
+import com.ywt.common.algorithm.sensitiveWord.SensitiveWordBs;
 import com.ywt.common.domain.enums.YesOrNoEnum;
 import com.ywt.common.utils.AssertUtil;
 import com.ywt.common.utils.discover.PrioritizedUrlDiscover;
@@ -45,8 +46,8 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgReq> {
     private UserInfoCache userInfoCache;
     @Autowired
     private RoleService roleService;
-//    @Autowired
-//    private SensitiveWordBs sensitiveWordBs;
+    @Autowired
+    private SensitiveWordBs sensitiveWordBs;
 
     private static final PrioritizedUrlDiscover URL_TITLE_DISCOVER = new PrioritizedUrlDiscover();
 
@@ -83,9 +84,8 @@ public class TextMsgHandler extends AbstractMsgHandler<TextMsgReq> {
         MessageExtra extra = Optional.ofNullable(msg.getExtra()).orElse(new MessageExtra());
         Message update = new Message();
         update.setId(msg.getId());
-        // TODO 消息过滤
-//        update.setContent(sensitiveWordBs.filter(body.getContent()));
-        update.setContent(body.getContent());
+        // 消息过滤
+        update.setContent(sensitiveWordBs.filter(body.getContent()));
         update.setExtra(extra);
         //如果有回复消息
         if (Objects.nonNull(body.getReplyMsgId())) {
