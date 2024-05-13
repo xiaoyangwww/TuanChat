@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 /**
  * 功能描述
  * 分布式锁切面
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月24日 11:30
  */
 @Slf4j

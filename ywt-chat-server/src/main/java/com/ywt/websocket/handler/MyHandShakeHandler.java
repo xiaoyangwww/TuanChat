@@ -28,7 +28,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 /**
  * 功能描述
  *  获取token的handler
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月21日 15:24
  */
 public class MyHandShakeHandler  extends ChannelInboundHandlerAdapter {

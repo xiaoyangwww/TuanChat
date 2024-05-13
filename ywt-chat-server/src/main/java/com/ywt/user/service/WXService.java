@@ -8,7 +8,7 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月20日 10:40
  */
 public interface WXService {

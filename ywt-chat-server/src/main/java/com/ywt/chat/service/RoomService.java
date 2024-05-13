@@ -1,6 +1,9 @@
 package com.ywt.chat.service;
 
 import com.ywt.chat.domain.entity.RoomFriend;
+import com.ywt.chat.domain.vo.Resp.ChatRoomResp;
+import com.ywt.common.domain.vo.Req.CursorPageBaseReq;
+import com.ywt.common.domain.vo.Resp.CursorPageBaseResp;
 
 import java.util.List;
 
@@ -26,4 +29,31 @@ public interface RoomService {
      * @param uidList
      */
     void disableChat(List<Long> uidList);
+
+    /**
+     * 会话列表
+     * @param request
+     * @param uid
+     * @return
+     */
+    CursorPageBaseResp<ChatRoomResp> getContactPage(CursorPageBaseReq request, Long uid);
+
+    /**
+     * 获取会话详情
+     * @param uid
+     * @param id
+     * @return
+     */
+    ChatRoomResp getContactDetail(Long uid, long id);
+
+    /**
+     * 联系人列表发消息用
+     * @param uid
+     * @param friendId
+     * @return
+     */
+    ChatRoomResp getContactDetailByFriend(Long uid, Long friendId);
+
+    RoomFriend getFriendRoom(Long uid, Long friendUid);
+
 }

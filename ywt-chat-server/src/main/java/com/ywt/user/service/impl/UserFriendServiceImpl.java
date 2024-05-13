@@ -52,7 +52,7 @@ import static com.ywt.user.domain.enums.ApplyStatusEnum.WAIT_APPROVAL;
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月30日 15:55
  */
 @Service

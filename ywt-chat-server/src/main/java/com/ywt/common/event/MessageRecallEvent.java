@@ -1,13 +1,13 @@
 package com.ywt.common.event;
 
-import com.ywt.user.domain.dto.ChatMsgRecallDTO;
+import com.ywt.chat.domain.dto.ChatMsgRecallDTO;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年05月08日 10:04
  */
 @Getter

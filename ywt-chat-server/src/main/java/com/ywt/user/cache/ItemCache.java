@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 功能描述
  *  物品本地缓存
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月23日 11:40
  */
 @Component

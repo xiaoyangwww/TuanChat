@@ -12,6 +12,9 @@ import com.ywt.common.domain.vo.Resp.CursorPageBaseResp;
 import com.ywt.common.utils.CursorUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.Objects;
+
 /**
  * <p>
  * 消息表 服务实现类
@@ -41,6 +44,18 @@ public class MessageDao extends ServiceImpl<MessageMapper, Message> {
                 .le(Message::getId,msgId)
                 .gt(Message::getId,replyMsgId)
                 .eq(Message::getRoomId,roomId)
+                .count();
+    }
+
+    /**
+     * 获取未读数
+     * @param roomId
+     * @param readTime
+     * @return
+     */
+    public Integer getUnReadCountMap(Long roomId, Date readTime) {
+        return lambdaQuery().eq(Message::getRoomId, roomId)
+                .gt(Objects.nonNull(readTime),Message::getCreateTime, readTime)
                 .count();
     }
 }

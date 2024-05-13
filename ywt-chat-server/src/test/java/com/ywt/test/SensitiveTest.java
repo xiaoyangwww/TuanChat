@@ -15,6 +15,8 @@ import java.util.List;
  * Date: 2023-10-08
  */
 public class SensitiveTest {
+
+
     @Test
     public void DFA() {
         List<String> sensitiveList = Arrays.asList("abcd", "abcbba", "adabca");
@@ -36,10 +38,11 @@ public class SensitiveTest {
     public void ACPro()
     {
         List<String> sensitiveList = Arrays.asList("白痴", "你是白痴", "白痴吗");
-        ACProFilter acProFilter=new ACProFilter();
+        ACProFilter acProFilter = new ACProFilter();
         acProFilter.loadWord(sensitiveList);
         System.out.println(acProFilter.filter("你是白痴吗"));
     }
+
     @Test
     public void DFAMulti() {
         List<String> sensitiveList = Arrays.asList("白痴", "你是白痴", "白痴吗");

@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * 功能描述
  * 发送消息更新房间收信箱，并同步给房间成员信箱
- * @author: scott
+ * @author: ywt
  * @date: 2024年05月06日 9:34
  */
 @RocketMQMessageListener(consumerGroup = MQConstant.SEND_MSG_GROUP,topic = MQConstant.SEND_MSG_TOPIC)

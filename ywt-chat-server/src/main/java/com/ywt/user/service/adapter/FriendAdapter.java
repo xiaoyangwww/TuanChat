@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月30日 17:55
  */
 public class FriendAdapter {

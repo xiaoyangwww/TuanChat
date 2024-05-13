@@ -3,13 +3,15 @@ package com.ywt.chat.domain.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * <p>
@@ -22,6 +24,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("message_mark")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class MessageMark implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -29,7 +34,7 @@ public class MessageMark implements Serializable {
     /**
      * id
      */
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -45,7 +50,7 @@ public class MessageMark implements Serializable {
     private Long uid;
 
     /**
-     * 标记类型 1点赞 2举报
+     * 标记类型 1点赞 2点踩
      */
     @TableField("type")
     private Integer type;

@@ -3,7 +3,7 @@ package com.ywt.common.constant;
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月20日 17:00
  */
 public class RedisKey {

@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 功能描述
  *  好友校验
- * @author: scott
+ * @author: ywt
  * @date: 2024年05月01日 15:14
  */
 @Data

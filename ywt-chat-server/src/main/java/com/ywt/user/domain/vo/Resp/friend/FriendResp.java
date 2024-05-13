@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 /**
  * 功能描述
  * 好友信息
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月30日 15:49
  */
 @Data

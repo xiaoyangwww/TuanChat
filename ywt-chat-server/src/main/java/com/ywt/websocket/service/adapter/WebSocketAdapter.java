@@ -1,19 +1,24 @@
 package com.ywt.websocket.service.adapter;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.ywt.chat.domain.dto.ChatMessageMarkDTO;
 import com.ywt.chat.domain.vo.Resp.ChatMessageResp;
 import com.ywt.common.domain.enums.YesOrNoEnum;
-import com.ywt.user.domain.dto.ChatMsgRecallDTO;
+import com.ywt.chat.domain.dto.ChatMsgRecallDTO;
 import com.ywt.user.domain.entity.User;
 import com.ywt.websocket.domain.enums.WSRespTypeEnum;
 import com.ywt.websocket.domain.vo.message.*;
 import com.ywt.websocket.domain.vo.resp.WSBaseResp;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
+import org.springframework.beans.BeanUtils;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月18日 23:08
  */
 public class WebSocketAdapter {
@@ -98,6 +103,19 @@ public class WebSocketAdapter {
         BeanUtil.copyProperties(chatMsgRecallDTO,wsMsgRecall);
         wsMsgRecallWSBaseResp.setData(wsMsgRecall);
         return wsMsgRecallWSBaseResp;
+    }
+
+    public static WSBaseResp<?> buildMarkMsg(ChatMessageMarkDTO dto, Integer markCount) {
+        WSMsgMark.WSMsgMarkItem item = new WSMsgMark.WSMsgMarkItem();
+        BeanUtils.copyProperties(dto, item);
+        item.setMarkCount(markCount);
+        WSBaseResp<WSMsgMark> wsBaseResp = new WSBaseResp<>();
+        wsBaseResp.setType(WSRespTypeEnum.MARK.getType());
+        WSMsgMark mark = new WSMsgMark();
+        mark.setMarkList(Collections.singletonList(item));
+        wsBaseResp.setData(mark);
+        return wsBaseResp;
+
     }
 }
 

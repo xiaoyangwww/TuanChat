@@ -29,7 +29,7 @@ public class WSMsgMark {
         /**
          * @see
          */
-        @ApiModelProperty("标记类型 1点赞 2举报")
+        @ApiModelProperty("标记类型 1点赞 2点踩")
         private Integer markType;
         @ApiModelProperty("被标记的数量")
         private Integer markCount;

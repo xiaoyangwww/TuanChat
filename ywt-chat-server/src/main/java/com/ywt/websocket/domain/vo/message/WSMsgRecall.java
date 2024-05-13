@@ -1,7 +1,7 @@
 package com.ywt.websocket.domain.vo.message;
 
 
-import com.ywt.user.domain.dto.ChatMsgRecallDTO;
+import com.ywt.chat.domain.dto.ChatMsgRecallDTO;
 import lombok.Data;
 
 /**

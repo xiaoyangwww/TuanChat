@@ -4,21 +4,31 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.ywt.chat.dao.*;
+import com.ywt.chat.domain.dto.MsgReadInfoDTO;
 import com.ywt.chat.domain.entity.*;
+import com.ywt.chat.domain.enums.MessageMarkActTypeEnum;
+import com.ywt.chat.domain.enums.MessageReadEnum;
 import com.ywt.chat.domain.enums.MessageTypeEnum;
-import com.ywt.chat.domain.vo.Req.ChatMessageBaseReq;
-import com.ywt.chat.domain.vo.Req.ChatMessageReq;
+import com.ywt.chat.domain.vo.Req.*;
+import com.ywt.chat.domain.vo.Req.msg.ChatMessageMarkReq;
+import com.ywt.chat.domain.vo.Resp.ChatMessageReadResp;
 import com.ywt.chat.domain.vo.Resp.ChatMessageResp;
 import com.ywt.chat.mapper.RoomMapper;
 import com.ywt.chat.service.ChatService;
+import com.ywt.chat.service.ContactService;
 import com.ywt.chat.service.adapter.MessageAdapter;
+import com.ywt.chat.service.adapter.RoomAdapter;
 import com.ywt.chat.service.cache.RoomCache;
 import com.ywt.chat.service.cache.RoomFriendCache;
 import com.ywt.chat.service.cache.RoomGroupCache;
+import com.ywt.chat.service.strategy.mark.AbstractMsgMarkStrategy;
+import com.ywt.chat.service.strategy.mark.MsgMarkFactory;
 import com.ywt.chat.service.strategy.msg.AbstractMsgHandler;
 import com.ywt.chat.service.strategy.msg.MsgHandlerFactory;
 import com.ywt.chat.service.strategy.msg.RecallMsgHandler;
+import com.ywt.common.annotation.RedissonLock;
 import com.ywt.common.domain.enums.NormalOrNoEnum;
 import com.ywt.common.domain.vo.Req.ChatMessagePageReq;
 import com.ywt.common.domain.vo.Req.CursorPageBaseReq;
@@ -39,7 +49,7 @@ import java.util.stream.Collectors;
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年05月03日 10:05
  */
 @Service
@@ -77,6 +87,9 @@ public class ChatServiceImpl implements ChatService {
 
     @Autowired
     private RecallMsgHandler recallMsgHandler;
+
+    @Autowired
+    private ContactService contactService;
 
 
     /**
@@ -146,21 +159,77 @@ public class ChatServiceImpl implements ChatService {
     public void recallMsg(Long uid, ChatMessageBaseReq request) {
         Message message = messageDao.getById(request.getMsgId());
         //校验能不能执行撤回
-        checkRecall(message,uid,request.getRoomId());
+        checkRecall(message, uid);
         //执行消息撤回
-        recallMsgHandler.recall(uid,message);
+        recallMsgHandler.recall(uid, message);
     }
 
-    private void checkRecall(Message message, Long uid, Long roomId) {
-        AssertUtil.isNotEmpty(message,"消息有误");
-        AssertUtil.notEqual(message.getType(), MessageTypeEnum.RECALL.getType(),"消息无法撤回");
+    @Override
+    @RedissonLock(key = "#uid")
+    public void setMsgMark(Long uid, ChatMessageMarkReq request) {
+        AbstractMsgMarkStrategy strategy = MsgMarkFactory.getStrategyNoNull(request.getMarkType());
+        Integer actType = request.getActType();
+        switch (MessageMarkActTypeEnum.of(actType)) {
+            case MARK:
+                strategy.mark(uid, request.getMsgId());
+                break;
+            case UN_MARK:
+                strategy.unMark(uid, request.getMsgId());
+                break;
+        }
+    }
+
+    @Override
+    @RedissonLock(key = "#uid")
+    public void msgRead(Long uid, ChatMessageMemberReq request) {
+        Contact contact = contactDao.get(request.getRoomId(), uid);
+        Contact saveOrUpdate = new Contact();
+        if (ObjectUtil.isNotNull(contact)) {
+            saveOrUpdate.setId(contact.getId());
+            saveOrUpdate.setReadTime(new Date());
+        } else {
+            saveOrUpdate.setReadTime(new Date());
+            saveOrUpdate.setUid(uid);
+            saveOrUpdate.setRoomId(request.getRoomId());
+        }
+        contactDao.saveOrUpdate(saveOrUpdate);
+    }
+
+    @Override
+    public CursorPageBaseResp<ChatMessageReadResp> getReadPage(Long uid, ChatMessageReadReq request) {
+        Message message = messageDao.getById(request.getMsgId());
+        Long searchType = request.getSearchType();
+        CursorPageBaseResp<Contact> page;
+        if (MessageReadEnum.READ.getType().equals(searchType)) {
+            page = contactDao.getReadPage(request, message);// 获取信息已读列表
+        } else {
+            page = contactDao.getUnReadPage(request, message); // 获取信息未读列表
+        }
+        if (CollectionUtil.isEmpty(page.getList())) {
+            return CursorPageBaseResp.empty();
+        }
+        return CursorPageBaseResp.init(page, RoomAdapter.buildReadResp(page.getList()));
+    }
+
+    @Override
+    public Collection<MsgReadInfoDTO> getMsgReadInfo(Long uid, ChatMessageReadInfoReq request) {
+        List<Message> messages = messageDao.listByIds(request.getMsgIds());
+        messages.forEach(message -> {
+            AssertUtil.equal(uid, message.getFromUid(), "只能查询自己发送的消息");
+        });
+        return contactService.getMsgReadInfo(messages);
+    }
+
+    private void checkRecall(Message message, Long uid) {
+        AssertUtil.isNotEmpty(message, "消息有误");
+        AssertUtil.notEqual(message.getType(), MessageTypeEnum.RECALL.getType(), "消息无法撤回");
         boolean hasPower = roleService.hasPower(uid, RoleEnum.ADMIN);
         if (hasPower) {
             return;
         }
-        AssertUtil.equal(uid,message.getFromUid(),"您没有权限");
+        AssertUtil.equal(uid, message.getFromUid(), "您没有权限");
         long between = DateUtil.between(message.getCreateTime(), new Date(), DateUnit.MINUTE);
-        AssertUtil.isTrue(between <= 2,"覆水难收，超过2分钟的消息不能撤回哦~~");
+        AssertUtil.isTrue(between <= 2, "覆水难收，超过2分钟的消息不能撤回哦~~");
     }
 
     private List<ChatMessageResp> getMsgRespBatch(List<Message> messages, Long uid) {

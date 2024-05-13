@@ -8,7 +8,7 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlOutTextMessage;
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月17日 16:40
  */
 public class TextBuilder {

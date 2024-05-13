@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * 功能描述
  * 消息适配器
- * @author: scott
+ * @author: ywt
  * @date: 2024年05月03日 11:59
  */
 public class MessageAdapter {

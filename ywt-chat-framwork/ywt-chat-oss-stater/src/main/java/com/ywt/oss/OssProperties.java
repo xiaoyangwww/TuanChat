@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年05月10日 10:54
  */
 @ConfigurationProperties(prefix = "oss")

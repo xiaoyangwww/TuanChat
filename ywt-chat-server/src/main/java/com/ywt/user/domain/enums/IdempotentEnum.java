@@ -6,7 +6,7 @@ import lombok.Getter;
 /**
  * 功能描述
  * 幂等枚举
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月23日 15:55
  */
 @AllArgsConstructor

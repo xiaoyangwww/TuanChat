@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 功能描述
  * Description: 申请好友信息
- * @author: scott
+ * @author: ywt
  * @date: 2024年05月01日 15:41
  */
 @Data

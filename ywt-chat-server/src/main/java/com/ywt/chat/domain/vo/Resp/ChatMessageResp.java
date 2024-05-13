@@ -52,9 +52,9 @@ public class ChatMessageResp {
         private Integer likeCount;
         @ApiModelProperty("该用户是否已经点赞 0否 1是")
         private Integer userLike;
-        @ApiModelProperty("举报数")
+        @ApiModelProperty("点踩数")
         private Integer dislikeCount;
-        @ApiModelProperty("该用户是否已经举报 0否 1是")
+        @ApiModelProperty("该用户是否已经点踩 0否 1是")
         private Integer userDislike;
     }
 }

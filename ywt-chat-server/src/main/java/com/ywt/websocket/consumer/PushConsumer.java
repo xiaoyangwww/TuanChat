@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年05月06日 11:33
  */
 @RocketMQMessageListener(topic = MQConstant.PUSH_TOPIC,consumerGroup = MQConstant.PUSH_GROUP,messageModel = MessageModel.BROADCASTING)

@@ -1,4 +1,4 @@
-package com.ywt.user.domain.dto;
+package com.ywt.chat.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

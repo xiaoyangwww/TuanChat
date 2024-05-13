@@ -5,7 +5,7 @@ import com.ywt.common.domain.dto.RequestInfo;
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月21日 23:09
  */
 public class RequestHolder {

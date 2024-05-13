@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationEvent;
 /**
  * 功能描述
  *  用户注册事件
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月24日 15:08
  */
 @Getter

@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年05月10日 15:48
  */
 public class EmojiAdapter {

@@ -6,7 +6,7 @@ import lombok.Data;
 /**
  * 功能描述
  * ws的基本返回信息体
- * @author: scott
+ * @author: ywt
  * @date: 2024年04月15日 16:32
  */
 @Data

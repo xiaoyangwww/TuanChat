@@ -7,13 +7,15 @@ import com.ywt.chat.domain.enums.MessageStatusEnum;
 import com.ywt.chat.domain.enums.RoomTypeEnum;
 import com.ywt.common.domain.enums.NormalOrNoEnum;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年05月06日 17:05
  */
 public class ChatAdapter {
@@ -48,5 +50,13 @@ public class ChatAdapter {
         roomFriend.setRoomKey(key);
         roomFriend.setStatus(NormalOrNoEnum.NORMAL.getStatus());
         return roomFriend;
+    }
+
+    public static Set<Long> getFriendUidSet(Collection<RoomFriend> values, Long uid) {
+        return values.stream().map(item -> getFriendUid(item, uid)).collect(Collectors.toSet());
+    }
+
+    public static Long getFriendUid(RoomFriend roomFriend, Long uid) {
+        return uid.equals(roomFriend.getUid1()) ? roomFriend.getUid2() : roomFriend.getUid1();
     }
 }

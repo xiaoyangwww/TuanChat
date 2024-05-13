@@ -8,7 +8,7 @@ import com.ywt.chat.domain.entity.msg.MsgRecall;
 import com.ywt.chat.domain.enums.MessageTypeEnum;
 import com.ywt.common.event.MessageRecallEvent;
 import com.ywt.user.cache.UserCache;
-import com.ywt.user.domain.dto.ChatMsgRecallDTO;
+import com.ywt.chat.domain.dto.ChatMsgRecallDTO;
 import com.ywt.user.domain.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;

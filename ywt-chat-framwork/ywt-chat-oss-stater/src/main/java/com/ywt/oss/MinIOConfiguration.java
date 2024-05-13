@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 功能描述
  *
- * @author: scott
+ * @author: ywt
  * @date: 2024年05月10日 10:49
  */
 @Configuration(proxyBeanMethods = false)
