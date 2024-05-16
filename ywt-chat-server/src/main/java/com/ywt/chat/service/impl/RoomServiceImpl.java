@@ -4,17 +4,16 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.ObjectUtil;
-import com.ywt.chat.dao.ContactDao;
-import com.ywt.chat.dao.MessageDao;
-import com.ywt.chat.dao.RoomDao;
-import com.ywt.chat.dao.RoomFriendDao;
+import com.ywt.chat.dao.*;
 import com.ywt.chat.domain.dto.RoomBaseInfo;
 import com.ywt.chat.domain.entity.*;
+import com.ywt.chat.domain.enums.GroupRoleAPPEnum;
 import com.ywt.chat.domain.enums.HotFlagEnum;
 import com.ywt.chat.domain.enums.RoomTypeEnum;
 import com.ywt.chat.domain.vo.Resp.ChatRoomResp;
 import com.ywt.chat.service.RoomService;
 import com.ywt.chat.service.adapter.ChatAdapter;
+import com.ywt.chat.service.adapter.RoomAdapter;
 import com.ywt.chat.service.cache.*;
 import com.ywt.chat.service.strategy.mark.AbstractMsgMarkStrategy;
 import com.ywt.chat.service.strategy.msg.AbstractMsgHandler;
@@ -74,6 +73,12 @@ public class RoomServiceImpl implements RoomService {
     @Autowired
     @Lazy
     private RoomService roomService;
+
+    @Autowired
+    private GroupMemberDao groupMemberDao;
+
+    @Autowired
+    private RoomGroupDao roomGroupDao;
 
 
     @Override
@@ -158,6 +163,27 @@ public class RoomServiceImpl implements RoomService {
     public RoomFriend getFriendRoom(Long uid, Long friendUid) {
         String key = ChatAdapter.generateRoomKey(Arrays.asList(uid, friendUid));
         return roomFriendDao.getByRoomKey(key);
+    }
+
+    @Override
+    public RoomGroup createGroupRoom(Long uid) {
+        List<GroupMember> selfGroup = groupMemberDao.getSelfGroup(uid);
+        AssertUtil.isEmpty(selfGroup, "每个人只能创建一个群");
+        User user = userInfoCache.get(uid);
+        // 创建房间
+        Room room = RoomAdapter.buildRoom(RoomTypeEnum.GROUP);
+        roomDao.save(room);
+        // 创建群聊
+        RoomGroup roomGroup = RoomAdapter.buildRoomGroup(user,room.getId());
+        roomGroupDao.save(roomGroup);
+        // 插入群主
+        GroupMember leader = GroupMember.builder()
+                .groupId(roomGroup.getId())
+                .role(GroupRoleAPPEnum.LEADER.getType())
+                .uid(uid)
+                .build();
+        groupMemberDao.save(leader);
+        return roomGroup;
     }
 
     private List<ChatRoomResp> buildContactResp(Long uid, List<Long> roomList) {

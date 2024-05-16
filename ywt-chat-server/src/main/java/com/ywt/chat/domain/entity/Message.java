@@ -3,8 +3,11 @@ package com.ywt.chat.domain.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.time.LocalDateTime;
+
 import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serializable;
 import java.util.Date;
 
@@ -33,7 +36,7 @@ public class Message implements Serializable {
     /**
      * id
      */
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -74,6 +77,7 @@ public class Message implements Serializable {
 
     /**
      * 消息类型 1正常文本 2.撤回消息....
+     *
      * @see com.ywt.chat.domain.enums.MessageTypeEnum
      */
     @TableField("type")

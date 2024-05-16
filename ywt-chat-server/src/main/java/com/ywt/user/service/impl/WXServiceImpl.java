@@ -4,6 +4,9 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.ywt.chat.transaction.service.MQProducer;
+import com.ywt.common.constant.MQConstant;
+import com.ywt.common.domain.dto.LoginMessageDTO;
 import com.ywt.user.dao.UserDao;
 import com.ywt.user.domain.entity.User;
 import com.ywt.user.service.UserService;
@@ -63,7 +66,8 @@ public class WXServiceImpl implements WXService {
     @Lazy
     private WebSocketService webSocketService;
 
-
+    @Autowired
+    private MQProducer mqProducer;
 
 
     @Override
@@ -76,7 +80,8 @@ public class WXServiceImpl implements WXService {
         User user = userDao.getUserByOpenId(openId);
         // 用户存在并且有权限，直接登录
         if(ObjectUtil.isNotNull(user) && StrUtil.isNotEmpty(user.getAvatar())) {
-            // TODO 消息订阅
+            // 消息订阅
+            mqProducer.sendMsg(MQConstant.LOGIN_MSG_TOPIC, new LoginMessageDTO(user.getId(), Integer.parseInt(code)));
             return null;
         }
         // 用户不存在，注册
@@ -89,7 +94,6 @@ public class WXServiceImpl implements WXService {
         WAIT_AUTH_MAP.put(openId,Integer.parseInt(code));
         // 通过websocket 发送已经扫码，等待授权的消息
         webSocketService.handleScanSuccess(Integer.parseInt(code));
-
 
         // 给用户发送用户授权信息
         String authUrl = String.format(URL, wxMpService.getWxMpConfigStorage().getAppId(), URLEncoder.encode(callback + "/wx/portal/public/callBack"));

@@ -1,6 +1,7 @@
 package com.ywt.chat.service;
 
 import com.ywt.chat.domain.entity.RoomFriend;
+import com.ywt.chat.domain.entity.RoomGroup;
 import com.ywt.chat.domain.vo.Resp.ChatRoomResp;
 import com.ywt.common.domain.vo.Req.CursorPageBaseReq;
 import com.ywt.common.domain.vo.Resp.CursorPageBaseResp;
@@ -56,4 +57,10 @@ public interface RoomService {
 
     RoomFriend getFriendRoom(Long uid, Long friendUid);
 
+    /**
+     * 创建一个群聊
+     * @param uid
+     * @return
+     */
+    RoomGroup createGroupRoom(Long uid);
 }

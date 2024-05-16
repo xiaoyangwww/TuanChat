@@ -3,13 +3,17 @@ package com.ywt.chat.service;
 import com.ywt.chat.domain.dto.MsgReadInfoDTO;
 import com.ywt.chat.domain.entity.Message;
 import com.ywt.chat.domain.vo.Req.*;
+import com.ywt.chat.domain.vo.Req.member.MemberReq;
 import com.ywt.chat.domain.vo.Req.msg.ChatMessageMarkReq;
+import com.ywt.chat.domain.vo.Resp.ChatMemberStatisticResp;
 import com.ywt.chat.domain.vo.Resp.ChatMessageReadResp;
 import com.ywt.chat.domain.vo.Resp.ChatMessageResp;
 import com.ywt.common.domain.vo.Req.ChatMessagePageReq;
 import com.ywt.common.domain.vo.Resp.CursorPageBaseResp;
+import com.ywt.websocket.domain.vo.message.ChatMemberResp;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface ChatService {
 
@@ -80,4 +84,16 @@ public interface ChatService {
      * @return
      */
     Collection<MsgReadInfoDTO> getMsgReadInfo(Long uid, ChatMessageReadInfoReq request);
+
+    /**
+     * 获取上线人数
+     * @return
+     */
+    ChatMemberStatisticResp getMemberStatistic();
+
+    /**
+     * 根据群成员获取上线，下线列表
+     * @return
+     */
+    CursorPageBaseResp<ChatMemberResp> getMemberPage(List<Long> memberUidList, MemberReq request);
 }

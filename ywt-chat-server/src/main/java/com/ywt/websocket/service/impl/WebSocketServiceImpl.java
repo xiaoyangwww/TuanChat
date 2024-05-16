@@ -1,14 +1,17 @@
 package com.ywt.websocket.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.ywt.common.event.UserBlackEvent;
 import com.ywt.common.event.UserOnlineEvent;
 import com.ywt.common.utils.NettyUtil;
 import com.ywt.common.config.ThreadPoolConfig;
+import com.ywt.user.cache.UserCache;
 import com.ywt.user.dao.UserDao;
 import com.ywt.user.domain.entity.User;
 import com.ywt.user.domain.enums.RoleEnum;
@@ -33,6 +36,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -78,6 +83,9 @@ public class WebSocketServiceImpl implements WebSocketService {
     @Autowired
     private RoleService roleService;
 
+    @Autowired
+    private UserCache userCache;
+
     /**
      * 所有已连接的websocket连接列表和一些额外参数(已经登录的用户) channel -> user
      */
@@ -117,7 +125,30 @@ public class WebSocketServiceImpl implements WebSocketService {
 
     @Override
     public void userOffLine(Channel channel) {
+        WSChannelExtraDTO wsChannelExtraDTO = ONLINE_WS_MAP.get(channel);
+        Optional<Long> uidOptional = Optional.ofNullable(wsChannelExtraDTO).map(WSChannelExtraDTO::getUid);
+        // 判断用户是否全部下线
+        boolean offLine = offLine(channel,uidOptional);
+        //已登录用户断连,并且全下线成功
+        if (uidOptional.isPresent() && offLine) {
+            User user = new User();
+            user.setId(uidOptional.get());
+            user.setLastOptTime(new Date());
+            applicationEventPublisher.publishEvent(new UserBlackEvent(this,user));
+        }
+
+    }
+
+    private boolean offLine(Channel channel, Optional<Long> uidOptional) {
         ONLINE_WS_MAP.remove(channel);
+        if (uidOptional.isPresent()) {
+            CopyOnWriteArrayList<Channel> channels = ONLINE_UID_MAP.get(uidOptional.get());
+            if (CollectionUtil.isNotEmpty(channels)) {
+                channels.removeIf(ch -> Objects.equals(ch, channel));
+            }
+            return CollectionUtil.isEmpty(ONLINE_UID_MAP.get(uidOptional.get()));
+        }
+        return true;
     }
 
     @Override
@@ -184,17 +215,38 @@ public class WebSocketServiceImpl implements WebSocketService {
         channels.forEach(channel -> threadPoolTaskExecutor.execute(() -> sendMsg(channel, wsBaseMsg)));
     }
 
+    @Override
+    public Boolean scanLoginSuccess(Integer loginCode, Long uid) {
+        //确认连接在该机器
+        Channel channel = WAIT_LOGIN_MAP.getIfPresent(loginCode);
+        if (Objects.isNull(channel)) {
+            return Boolean.FALSE;
+        }
+        User user = userDao.getById(uid);
+        //移除code
+        WAIT_LOGIN_MAP.invalidate(loginCode);
+        //调用用户登录模块
+        String token = loginService.login(uid);
+        //用户登录
+        loginSuccess(channel, user, token);
+        return Boolean.TRUE;
+    }
+
     private void loginSuccess(Channel channel, User user, String token) {
         //更新上线列表
         online(channel, user.getId());
         user.setLastOptTime(new Date());
-        // 刷新用户的ip地址
-        user.refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));
-        // 登录成功发送消息，进行ip解析
-        applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
         boolean hasPower = roleService.hasPower(user.getId(), RoleEnum.CHAT_MANAGER);
         // 发送登录成功的信息
         sendMsg(channel, WebSocketAdapter.buildLoginSuccessResp(user, token, hasPower));
+        //发送用户上线事件
+        boolean online = userCache.isOnline(user.getId());
+        if (!online) {
+            // 刷新用户的ip地址
+            user.refreshIp(NettyUtil.getAttr(channel, NettyUtil.IP));
+            // 登录成功发送消息，进行ip解析
+            applicationEventPublisher.publishEvent(new UserOnlineEvent(this, user));
+        }
     }
 
     private void online(Channel channel, Long uid) {
@@ -203,6 +255,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         ONLINE_UID_MAP.putIfAbsent(uid,new CopyOnWriteArrayList<>());
         ONLINE_UID_MAP.get(uid).add(channel);
         NettyUtil.setAttr(channel, NettyUtil.UID, uid);
+
     }
 
     /**

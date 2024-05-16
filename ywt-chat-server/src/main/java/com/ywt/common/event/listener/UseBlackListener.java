@@ -4,6 +4,7 @@ import com.ywt.common.event.UserBlackEvent;
 import com.ywt.user.cache.UserCache;
 import com.ywt.user.dao.UserDao;
 import com.ywt.user.domain.entity.User;
+import com.ywt.websocket.domain.enums.WSRespTypeEnum;
 import com.ywt.websocket.domain.vo.message.WSBlack;
 import com.ywt.websocket.domain.vo.resp.WSBaseResp;
 import com.ywt.websocket.service.WebSocketService;
@@ -43,7 +44,7 @@ public class UseBlackListener {
     public void sendAllUser(UserBlackEvent event) {
         User user = event.getUser();
         WSBaseResp<WSBlack> wsBlackWSBaseResp = WebSocketAdapter.buildBlackResp(user);
-        webSocketService.sendBlackMsg(wsBlackWSBaseResp);
+        webSocketService.sendToAllOnline(wsBlackWSBaseResp, user.getId());
     }
 
     /**
@@ -53,6 +54,7 @@ public class UseBlackListener {
     @EventListener(classes = UserBlackEvent.class)
     public void deleteBlackMap(UserBlackEvent event) {
        userCache.evictBlackMap();
+       userCache.remove(event.getUser().getId());
     }
 
     /**

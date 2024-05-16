@@ -2,15 +2,20 @@ package com.ywt.websocket.service.adapter;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.ywt.chat.domain.dto.ChatMessageMarkDTO;
+import com.ywt.chat.domain.vo.Resp.ChatMemberStatisticResp;
 import com.ywt.chat.domain.vo.Resp.ChatMessageResp;
+import com.ywt.chat.service.ChatService;
 import com.ywt.common.domain.enums.YesOrNoEnum;
 import com.ywt.chat.domain.dto.ChatMsgRecallDTO;
 import com.ywt.user.domain.entity.User;
+import com.ywt.user.domain.enums.ChatActiveStatusEnum;
 import com.ywt.websocket.domain.enums.WSRespTypeEnum;
 import com.ywt.websocket.domain.vo.message.*;
 import com.ywt.websocket.domain.vo.resp.WSBaseResp;
 import me.chanjar.weixin.mp.bean.result.WxMpQrCodeTicket;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,7 +26,11 @@ import java.util.Collections;
  * @author: ywt
  * @date: 2024年04月18日 23:08
  */
+@Component
 public class WebSocketAdapter {
+
+    @Autowired
+    private ChatService chatService;
 
     /**
      * 封装登录的消息
@@ -116,6 +125,46 @@ public class WebSocketAdapter {
         wsBaseResp.setData(mark);
         return wsBaseResp;
 
+    }
+    public WSBaseResp<WSOnlineOfflineNotify> buildOnlineNotifyResp(User user) {
+        WSBaseResp<WSOnlineOfflineNotify> wsBaseResp = new WSBaseResp<>();
+        wsBaseResp.setType(WSRespTypeEnum.ONLINE_OFFLINE_NOTIFY.getType());
+        WSOnlineOfflineNotify onlineOfflineNotify = new WSOnlineOfflineNotify();
+        onlineOfflineNotify.setChangeList(Collections.singletonList(buildOnlineInfo(user)));
+        assembleNum(onlineOfflineNotify);
+        wsBaseResp.setData(onlineOfflineNotify);
+        return wsBaseResp;
+    }
+
+    private ChatMemberResp buildOnlineInfo(User user) {
+        return ChatMemberResp.builder()
+                .activeStatus(ChatActiveStatusEnum.ONLINE.getType())
+                .uid(user.getId())
+                .lastOptTime(user.getLastOptTime())
+                .build();
+    }
+
+    public WSBaseResp<?> buildOfflineNotifyResp(User user) {
+        WSBaseResp<WSOnlineOfflineNotify> wsOnlineOfflineNotifyWSBaseResp = new WSBaseResp<>();
+        wsOnlineOfflineNotifyWSBaseResp.setType(WSRespTypeEnum.ONLINE_OFFLINE_NOTIFY.getType());
+        WSOnlineOfflineNotify wsOnlineOfflineNotify = WSOnlineOfflineNotify.builder()
+                .changeList(Collections.singletonList(buildOfflineInfo(user)))
+                .build();
+        assembleNum(wsOnlineOfflineNotify);
+        return wsOnlineOfflineNotifyWSBaseResp;
+    }
+
+    private void assembleNum(WSOnlineOfflineNotify onlineOfflineNotify) {
+        ChatMemberStatisticResp memberStatistic = chatService.getMemberStatistic();
+        onlineOfflineNotify.setOnlineNum(memberStatistic.getOnlineNum());
+    }
+
+    private static ChatMemberResp buildOfflineInfo(User user) {
+        return ChatMemberResp.builder()
+                .activeStatus(ChatActiveStatusEnum.OFFLINE.getType())
+                .uid(user.getId())
+                .lastOptTime(user.getLastOptTime())
+                .build();
     }
 }
 

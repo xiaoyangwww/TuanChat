@@ -1,6 +1,7 @@
 package com.ywt.user.cache;
 
 import cn.hutool.core.collection.CollUtil;
+import com.baomidou.mybatisplus.extension.api.R;
 import com.ywt.common.constant.RedisKey;
 import com.ywt.user.dao.*;
 import com.ywt.user.domain.entity.Black;
@@ -112,5 +113,48 @@ public class UserCache {
     public List<Long> getRedisLastModifyTimeList(List<Long> uids) {
         List<String> keys = uids.stream().map(id -> RedisKey.getKey(RedisKey.USER_MODIFY_STRING,id)).collect(Collectors.toList());
         return RedisUtils.mget(keys, Long.class);
+    }
+
+    /**
+     * 用户下线
+     */
+    public void offline(Long uid, Date lastOptTime) {
+        // 清除上线表
+        RedisUtils.zRemove(RedisKey.getKey(RedisKey.ONLINE_UID_ZET),uid);
+        // 更新下线表
+        RedisUtils.zAdd(RedisKey.getKey(RedisKey.OFFLINE_UID_ZET),uid,lastOptTime.getTime());
+
+    }
+
+    /**
+     * 用户上线
+     */
+    public void online(Long uid, Date lastOptTime) {
+        // 清除下线表
+        RedisUtils.zRemove(RedisKey.getKey(RedisKey.OFFLINE_UID_ZET),uid);
+        // 更新上线表
+        RedisUtils.zAdd(RedisKey.getKey(RedisKey.ONLINE_UID_ZET),uid,lastOptTime.getTime());
+    }
+
+    /**
+     * 获取上线用户人数
+     */
+    public Long getOnlineCount() {
+        return RedisUtils.zCard(RedisKey.getKey(RedisKey.ONLINE_UID_ZET));
+    }
+
+    /**
+     * 判断用户是否在上线表中
+     * @param uid
+     */
+    public boolean isOnline(Long uid) {
+        return RedisUtils.zIsMember(RedisKey.getKey(RedisKey.ONLINE_UID_ZET),uid);
+    }
+
+    public void remove(Long uid) {
+        // 清除上线表
+        RedisUtils.zRemove(RedisKey.getKey(RedisKey.ONLINE_UID_ZET),uid);
+        // 清除下线表
+        RedisUtils.zRemove(RedisKey.getKey(RedisKey.OFFLINE_UID_ZET),uid);
     }
 }

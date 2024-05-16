@@ -1,5 +1,6 @@
 package com.ywt.chat.dao;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ywt.chat.domain.entity.Contact;
 import com.ywt.chat.domain.entity.Message;
 import com.ywt.chat.domain.vo.Req.ChatMessageReadReq;
@@ -88,5 +89,23 @@ public class ContactDao extends ServiceImpl<ContactMapper, Contact> {
                 .ne(Contact::getUid,message.getFromUid())
                 .ge(Contact::getReadTime,message.getCreateTime())
                 .count();
+    }
+
+    /**
+     * 根据房间ID删除会话
+     *
+     * @param roomId  房间ID
+     * @param uidList 群成员列表
+     * @return 是否删除成功
+     */
+    public Boolean removeByRoomId(Long roomId, List<Long> uidList) {
+        LambdaQueryWrapper<Contact> wrapper = new LambdaQueryWrapper<>();
+        if (uidList.isEmpty()) {
+            wrapper.eq(Contact::getRoomId,roomId);
+        }else {
+            wrapper.eq(Contact::getRoomId,roomId)
+                    .in(Contact::getUid,uidList);
+        }
+        return remove(wrapper);
     }
 }

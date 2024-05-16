@@ -37,6 +37,7 @@ public class ContactServiceImpl implements ContactService {
             Integer readCount = contactDao.getReadCount(roomId, message);
             msgReadInfoDTO.setReadCount(readCount);
             msgReadInfoDTO.setReadCount(totalCount - readCount - 1);
+            msgReadInfoDTO.setMsgId(message.getId());
             return msgReadInfoDTO;
         }).collect(Collectors.toList());
     }

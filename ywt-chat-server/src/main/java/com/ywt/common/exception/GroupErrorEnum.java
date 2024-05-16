@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * @Author Kkuil
+ * @Author ywt
  * @Date 2023/10/24 15:50
  * @Description 群异常码
  */

@@ -56,4 +56,6 @@ public interface WebSocketService {
      * 普通群聊消息，发给相关在线用户
      */
     void sendToUid(WSBaseResp<?> wsBaseMsg, Long uid);
+
+    Boolean scanLoginSuccess(Integer code, Long uid);
 }

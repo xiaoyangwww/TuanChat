@@ -4,6 +4,7 @@ import com.ywt.chat.dao.GroupMemberDao;
 import com.ywt.chat.dao.RoomGroupDao;
 import com.ywt.chat.domain.entity.RoomGroup;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -35,5 +36,10 @@ public class GroupMemberCache {
             return null;
         }
         return groupMemberDao.getUidListByRoomGroupId(roomGroup.getId());
+    }
+
+    @CacheEvict(cacheNames = "member", key = "'groupMember'+#roomId")
+    public List<Long> evictMemberUidList(Long roomId) {
+        return null;
     }
 }

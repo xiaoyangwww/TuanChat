@@ -62,11 +62,18 @@ public class NettyWebSocketServerHandler extends SimpleChannelInboundHandler<Tex
         } else if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) evt;
             if (event.state() == IdleState.READER_IDLE) {
-                System.out.println("读空闲");
-                // TODO 用户下线
-//                userOffLine(ctx.channel());
+                // 用户下线
+                userOffLine(ctx.channel());
             }
         }
+    }
+
+
+    // 处理异常
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.warn("异常发生，异常消息 ={}", cause);
+        ctx.channel().close();
     }
 
     /**

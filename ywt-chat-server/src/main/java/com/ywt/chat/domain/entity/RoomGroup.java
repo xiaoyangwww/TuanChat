@@ -6,8 +6,7 @@ import java.time.LocalDateTime;
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * <p>
@@ -19,6 +18,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @TableName("room_group")
 public class RoomGroup implements Serializable {
 
@@ -27,7 +29,7 @@ public class RoomGroup implements Serializable {
     /**
      * id
      */
-      @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -58,7 +60,7 @@ public class RoomGroup implements Serializable {
      * 逻辑删除(0-正常,1-删除)
      */
     @TableField("delete_status")
-    @TableLogic(value = "0",delval = "1")
+    @TableLogic(value = "0", delval = "1")
     private Integer deleteStatus;
 
     /**

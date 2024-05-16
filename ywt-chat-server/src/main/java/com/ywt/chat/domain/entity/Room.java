@@ -14,8 +14,7 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ywt.chat.domain.enums.HotFlagEnum;
 import com.ywt.chat.domain.enums.RoomTypeEnum;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 /**
  * <p>
@@ -27,6 +26,9 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @TableName("room")
 public class Room implements Serializable {
 
