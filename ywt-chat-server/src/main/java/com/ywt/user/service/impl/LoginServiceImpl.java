@@ -1,5 +1,6 @@
 package com.ywt.user.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.auth0.jwt.interfaces.Claim;
 import com.ywt.common.constant.RedisKey;
 import com.ywt.common.utils.JwtUtils;
@@ -47,8 +48,14 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public String login(Long uid) {
-        String token = jwtUtils.createToken(uid);
-        RedisUtils.set(getUidKey(uid), token, TOKEN_EXPIRE_DAYS, TimeUnit.DAYS);
+        String key = RedisKey.getKey(RedisKey.USER_TOKEN_STRING, uid);
+        String token = RedisUtils.getStr(key);
+        if (StrUtil.isNotBlank(token)) {
+            return token;
+        }
+        //获取用户token
+        token = jwtUtils.createToken(uid);
+        RedisUtils.set(key, token, TOKEN_EXPIRE_DAYS, TimeUnit.DAYS);//token过期用redis中心化控制，初期采用5天过期，剩1天自动续期的方案。后续可以用双token实现
         return token;
     }
 

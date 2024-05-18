@@ -7,6 +7,7 @@ import com.ywt.chat.domain.vo.Req.msg.ChatMessageMarkReq;
 import com.ywt.chat.domain.vo.Resp.ChatMessageReadResp;
 import com.ywt.chat.domain.vo.Resp.ChatMessageResp;
 import com.ywt.chat.service.ChatService;
+import com.ywt.common.annotation.FrequencyControl;
 import com.ywt.common.domain.vo.Req.ChatMessagePageReq;
 import com.ywt.common.domain.vo.Resp.ApiResult;
 import com.ywt.common.domain.vo.Resp.CursorPageBaseResp;
@@ -50,7 +51,7 @@ public class ChatController {
 
     @PutMapping("/msg/mark")
     @ApiOperation("消息标记")
-//    @FrequencyControl(time = 10, count = 5, target = FrequencyControl.Target.UID)
+    @FrequencyControl(time = 10, count = 5, target = FrequencyControl.Target.UID)
     public ApiResult<Void> setMsgMark(@Valid @RequestBody ChatMessageMarkReq request) {
         chatService.setMsgMark(RequestHolder.get().getUid(), request);
         return ApiResult.success();
@@ -59,6 +60,7 @@ public class ChatController {
 
     @PutMapping("/msg/recall")
     @ApiOperation("撤回消息")
+    @FrequencyControl(time = 10, count = 5, target = FrequencyControl.Target.UID)
     public ApiResult<Void> recall(@Valid @RequestBody ChatMessageBaseReq request) {
          chatService.recallMsg(RequestHolder.get().getUid(),request);
          return ApiResult.success();
@@ -86,6 +88,7 @@ public class ChatController {
 
     @PostMapping("/msg")
     @ApiOperation("发送消息")
+    @FrequencyControl(time = 2, count = 5, target = FrequencyControl.Target.UID)
     public ApiResult<ChatMessageResp> sendMsg(@Valid @RequestBody ChatMessageReq request) {
         Long msgId = chatService.sendMsg(request, RequestHolder.get().getUid());
         //返回完整消息格式，方便前端展示

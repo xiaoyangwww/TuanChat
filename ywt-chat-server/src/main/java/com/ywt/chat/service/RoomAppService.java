@@ -25,10 +25,12 @@ public interface RoomAppService {
 
     /**
      * 房间内的所有群成员列表
+     *
+     * @param uid
      * @param request
      * @return
      */
-    List<ChatMemberListResp> getMemberList(ChatMessageMemberReq request);
+    List<ChatMemberListResp> getMemberList(Long uid, ChatMessageMemberReq request);
 
     /**
      * 移除成员

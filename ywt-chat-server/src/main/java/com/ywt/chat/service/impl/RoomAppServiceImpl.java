@@ -1,8 +1,6 @@
 package com.ywt.chat.service.impl;
 
 import com.ywt.chat.dao.GroupMemberDao;
-import com.ywt.chat.dao.RoomDao;
-import com.ywt.chat.dao.RoomGroupDao;
 import com.ywt.chat.domain.entity.GroupMember;
 import com.ywt.chat.domain.entity.Room;
 import com.ywt.chat.domain.entity.RoomGroup;
@@ -21,7 +19,6 @@ import com.ywt.chat.service.PushService;
 import com.ywt.chat.service.RoomAppService;
 import com.ywt.chat.service.RoomService;
 import com.ywt.chat.service.adapter.MemberAdapter;
-import com.ywt.chat.service.adapter.RoomAdapter;
 import com.ywt.chat.service.cache.GroupMemberCache;
 import com.ywt.chat.service.cache.RoomCache;
 import com.ywt.chat.service.cache.RoomGroupCache;
@@ -108,7 +105,7 @@ public class RoomAppServiceImpl implements RoomAppService {
             onlineNum = userCache.getOnlineCount();
         } else {
             // 群成员
-            List<Long> members = groupMemberCache.getMemberUidList(roomGroup.getId());
+            List<Long> members = groupMemberCache.getMemberUidList(roomGroup.getRoomId());
             onlineNum = userDao.getOnlineNum(members);
         }
         GroupRoleAPPEnum groupRole = getGroupRole(uid, roomGroup, room);
@@ -123,7 +120,7 @@ public class RoomAppServiceImpl implements RoomAppService {
 
     @Override
     @Cacheable(cacheNames = "member", key = "'memberList.'+#request.roomId")
-    public List<ChatMemberListResp> getMemberList(ChatMessageMemberReq request) {
+    public List<ChatMemberListResp> getMemberList(Long uid, ChatMessageMemberReq request) {
         Room room = roomCache.get(request.getRoomId());
         AssertUtil.isNotEmpty(room, "房间号有误");
         if (room.isHotRoom()) {
@@ -131,7 +128,8 @@ public class RoomAppServiceImpl implements RoomAppService {
             return MemberAdapter.buildMemberList(members);
         } else {
             RoomGroup roomGroup = roomGroupCache.get(request.getRoomId());
-            List<Long> members = groupMemberCache.getMemberUidList(roomGroup.getId());
+            List<Long> members = groupMemberCache.getMemberUidList(roomGroup.getRoomId());
+            members = members.stream().filter(id -> !id.equals(uid)).collect(Collectors.toList());
             Map<Long, User> batch = userInfoCache.getBatch(members);
             return MemberAdapter.buildMemberList(new ArrayList<>(batch.values()));
         }

@@ -7,7 +7,6 @@ import com.ywt.chat.domain.enums.GroupRoleEnum;
 import com.ywt.chat.mapper.GroupMemberMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ywt.chat.service.cache.GroupMemberCache;
-import com.ywt.user.domain.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;

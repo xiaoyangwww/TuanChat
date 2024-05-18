@@ -219,7 +219,7 @@ public class UserServiceImpl implements UserService {
         for (int i = 0; i < reqList.size(); i++) {
             Long modifyTime1 = reqList.get(i).getLastModifyTime();
             Long modifyTime2 = lastModifyTimeList.get(i);
-            if (ObjectUtil.isNull(modifyTime1) || ObjectUtil.isNull(modifyTime2) && modifyTime1 < modifyTime2) {
+            if (ObjectUtil.isNull(modifyTime1) || ObjectUtil.isNull(modifyTime2) || modifyTime1 < modifyTime2) {
                 needSyncUidList.add(reqList.get(i).getUid());
             }
         }

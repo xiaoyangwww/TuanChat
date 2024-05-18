@@ -1,7 +1,6 @@
 package com.ywt.chat.service.impl;
 
 import com.ywt.chat.dao.*;
-import com.ywt.chat.domain.entity.GroupMember;
 import com.ywt.chat.domain.entity.Room;
 import com.ywt.chat.domain.entity.RoomGroup;
 import com.ywt.chat.domain.vo.Req.member.AdminAddReq;
@@ -23,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.ywt.chat.constant.GroupConst.MAX_MANAGE_COUNT;
 

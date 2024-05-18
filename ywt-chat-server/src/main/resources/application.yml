@@ -6,7 +6,8 @@ logging:
 mybatis-plus:
   mapper-locations: classpath:mapper/**/*.xml
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 自动将数据库表的下划线命名
     map-underscore-to-camel-case: true
 spring:
   profiles:
@@ -63,6 +64,11 @@ chatai:
     url: ${mallchat.chatglm2.url}
     minute: 3 # 每个用户每3分钟可以请求一次
     AIUserId: ${mallchat.chatglm2.uid}
+  baidu:
+    use: ${mallchat.baidu.use}
+    AIUserId: ${mallchat.baidu.uid}
+    apiKey: ${mallchat.baidu.apiKey}
+    secretKey: ${mallchat.baidu.secretKey}
 rocketmq:
   name-server: ${rocketmq.name-server}
   # 默认的消息组

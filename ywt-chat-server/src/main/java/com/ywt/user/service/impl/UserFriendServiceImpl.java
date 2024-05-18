@@ -81,6 +81,8 @@ public class UserFriendServiceImpl implements UserFriendService {
     @Autowired
     private ChatService chatService;
 
+
+
     @Override
     public CursorPageBaseResp<FriendResp> friendList(Long uid, CursorPageBaseReq cursorPageBaseReq) {
         CursorPageBaseResp<UserFriend> friendPage =  friendDao.getFriendPage(uid, cursorPageBaseReq);
@@ -140,7 +142,7 @@ public class UserFriendServiceImpl implements UserFriendService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class)
     @RedissonLock(key = "#uid")
     public void applyApprove(Long uid, FriendApproveReq friendApproveReq) {
         UserApply userApply = userApplyDao.getById(friendApproveReq.getApplyId());
@@ -165,9 +167,12 @@ public class UserFriendServiceImpl implements UserFriendService {
             log.info("没有好友关系：{},{}", uid, friendUid);
             return;
         }
-        friendDao.removeByIds(userFriends);
+        List<Long> friendRecordIds = userFriends.stream().map(UserFriend::getId).collect(Collectors.toList());
+        friendDao.removeByIds(friendRecordIds);
         // 禁用房间
         roomService.disableChat(Arrays.asList(uid,friendUid));
+        // 删除好友申请列表
+        userApplyDao.deleteFriendApply(uid);
 
     }
 

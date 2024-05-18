@@ -50,4 +50,10 @@ public class RoomFriendDao extends ServiceImpl<RoomFriendMapper, RoomFriend> {
                 .eq(RoomFriend::getId,id)
                 .update();
     }
+
+    public RoomFriend get(Long roomId) {
+        return lambdaQuery()
+                .eq(RoomFriend::getRoomId, roomId)
+                .one();
+    }
 }

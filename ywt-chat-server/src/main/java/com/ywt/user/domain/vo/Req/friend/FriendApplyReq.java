@@ -1,6 +1,6 @@
 package com.ywt.user.domain.vo.Req.friend;
 
-import com.sun.istack.internal.NotNull;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +25,7 @@ public class FriendApplyReq {
     @ApiModelProperty("申请信息")
     private String msg;
 
-    @NotNull
+    @NotBlank
     @ApiModelProperty("好友uid")
     private Long targetUid;
 

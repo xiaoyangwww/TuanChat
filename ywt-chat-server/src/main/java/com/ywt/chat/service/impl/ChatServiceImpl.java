@@ -107,6 +107,9 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private RoomFriendDao roomFriendDao;
+
 
     /**
      * 发送消息
@@ -133,9 +136,9 @@ public class ChatServiceImpl implements ChatService {
         }
         // 判断是否是单聊
         if (room.isRoomFriend()) {
-            RoomFriend roomFriend = roomFriendCache.get(roomId);
+            RoomFriend roomFriend = roomFriendDao.getByRoomId(roomId);
             // 校验房间是否被禁用
-            AssertUtil.equal(NormalOrNoEnum.NOT_NORMAL.getStatus(), roomFriend.getStatus(), "您已经被对方拉黑");
+            AssertUtil.notEqual(NormalOrNoEnum.NOT_NORMAL.getStatus(), roomFriend.getStatus(), "您已经被对方拉黑");
             // 校验uid是否在房间内
             AssertUtil.isTrue(uid.equals(roomFriend.getUid1()) || uid.equals(roomFriend.getUid2()), "您已经被对方拉黑");
         }

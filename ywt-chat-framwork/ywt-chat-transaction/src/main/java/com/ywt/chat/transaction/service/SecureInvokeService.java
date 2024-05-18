@@ -42,7 +42,7 @@ public class SecureInvokeService {
     private final Executor executor;
 
 
-    @Scheduled(cron = "*/5 * * * * ?") // 每5秒执行一次
+    //@Scheduled(cron = "*/5 * * * * ?") // 每5秒执行一次
     public void retry() {
         List<SecureInvokeRecord> secureInvokeRecords = secureInvokeRecordDao.getWaitRetryRecords();
         for (SecureInvokeRecord secureInvokeRecord : secureInvokeRecords) {

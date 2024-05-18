@@ -88,8 +88,9 @@ public class WxPortalController {
         wxService.authorize(userInfo);
 
         RedirectView redirectView = new RedirectView();
-        redirectView.setUrl("https://mp.weixin.qq.com/s/m1SRsBG96kLJW5mPe4AVGA");
-//        redirectView.setUrl("www.Mallchat.cn");
+
+        redirectView.setUrl("https://mp.weixin.qq.com/s?__biz=MzkwMjY4NTMyMQ==&mid=2247483654&idx=1&sn=81b295c3dbe89d390d492d42e4634ac9&chksm=c0a0f6e0f7d77ff679c7e66916bd116015e516511fb58c60da1e7102560e35323f33415f4486&token=2083311068&lang=zh_CN#rd");
+
         return redirectView;
     }
 

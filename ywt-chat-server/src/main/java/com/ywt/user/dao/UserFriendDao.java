@@ -2,6 +2,7 @@ package com.ywt.user.dao;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
+import com.ywt.common.domain.enums.YesOrNoEnum;
 import com.ywt.common.domain.vo.Req.CursorPageBaseReq;
 import com.ywt.common.domain.vo.Req.PageBaseReq;
 import com.ywt.common.domain.vo.Resp.CursorPageBaseResp;
@@ -27,7 +28,8 @@ public class UserFriendDao extends ServiceImpl<UserFriendMapper, UserFriend> {
 
     public CursorPageBaseResp<UserFriend> getFriendPage(Long uid, CursorPageBaseReq cursorPageBaseReq) {
         return CursorUtils.getCursorPageByMysql(this, cursorPageBaseReq,
-                wrapper -> wrapper.eq(UserFriend::getId, uid),
+                wrapper -> wrapper.eq(UserFriend::getUid, uid)
+                        .eq(UserFriend::getDeleteStatus, YesOrNoEnum.NO.getCode()),
                 UserFriend::getId);
 
     }

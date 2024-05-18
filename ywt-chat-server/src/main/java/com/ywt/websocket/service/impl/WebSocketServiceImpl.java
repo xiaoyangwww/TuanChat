@@ -170,7 +170,7 @@ public class WebSocketServiceImpl implements WebSocketService {
         String token = loginService.login(user.getId());
         // 删除code -》 channel
         WAIT_LOGIN_MAP.invalidate(code);
-        // 认证
+        // 登录
         loginSuccess(channel, user, token);
     }
 

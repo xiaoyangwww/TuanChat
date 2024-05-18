@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.ywt.user.domain.enums.ApplyReadStatusEnum.READ;
 import static com.ywt.user.domain.enums.ApplyReadStatusEnum.UNREAD;
@@ -61,7 +62,7 @@ public class UserApplyDao extends ServiceImpl<UserApplyMapper, UserApply> {
 
     public IPage<UserApply> getApplyPage(Long uid, Page page ) {
         return lambdaQuery()
-                .eq(UserApply::getUid, uid)
+                .eq(UserApply::getTargetId, uid)
                 .eq(UserApply::getType, ADD_FRIEND.getCode())
                 .orderByDesc(UserApply::getCreateTime)
                 .page(page);
@@ -75,5 +76,13 @@ public class UserApplyDao extends ServiceImpl<UserApplyMapper, UserApply> {
                 .eq(UserApply::getTargetId,uid)
                 .in(UserApply::getId,applyIds)
                 .update();
+    }
+
+    public void deleteFriendApply(Long uid) {
+        List<Long> collect = lambdaQuery()
+                .eq(UserApply::getTargetId, uid)
+                .select(UserApply::getId)
+                .list().stream().map(UserApply::getId).collect(Collectors.toList());
+        removeByIds(collect);
     }
 }

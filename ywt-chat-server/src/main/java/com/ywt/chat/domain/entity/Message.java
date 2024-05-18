@@ -25,7 +25,7 @@ import lombok.*;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("message")
+@TableName(value = "message", autoResultMap = true)
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
